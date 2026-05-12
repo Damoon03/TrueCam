@@ -22,7 +22,7 @@ struct Feed: View {
                             Spacer()
                             
                             Text("TrueCam")
-                                .foregroundColor(.white)
+                                .foregroundStyle(Color(.white))
                                 .fontWeight(.semibold)
                                 .font(.system(size: 22))
                             
@@ -39,10 +39,10 @@ struct Feed: View {
                         
                         HStack {
                             Text("My Friends")
-                                .foregroundColor(.white)
-                            
+                                .foregroundStyle(Color(.white))
+
                             Text("Discovery")
-                                .foregroundColor(.gray)
+                                .foregroundStyle(Color(.gray))
                         }
                     }
                     Spacer()
