@@ -93,15 +93,44 @@ struct Profile: View {
                                 
                                 VStack {
                                     HStack(spacing: 4) {
-                                        ForEach(1 ..< 8) { _ in
-                                            MemoryView(day: 1)
+                                        ForEach(1 ..< 8) { x in
+                                            MemoryView(day: x)
                                         }
                                     }
+                                    
+                                    HStack(spacing: 4) {
+                                        ForEach(1 ..< 8) { x in
+                                            MemoryView(day: x + 7)
+                                        }
+                                    }
+                                    .padding(.top, -2)
                                 }
+                                .padding(.top, -2)
+                                
+                                Text("View all my Memories")
+                                    .foregroundStyle(Color.white)
+                                    .fontWeight(.semibold)
+                                    .font(.system(size: 13))
+                                    .overlay(RoundedRectangle(cornerRadius: 8)
+                                        .stroke(.gray,lineWidth: 2)
+                                        .frame(width: 155, height: 20)
+                                        .opacity(0.5))
+                                    .padding(8)
                             }
+                            
                         }
                     }
+                    
+                    Text("🔗TrueCam/damoon_che")
+                        .foregroundStyle(Color.white)
+                        .fontWeight(.semibold)
+                        .font(.system(size: 15))
+                        .padding(.top, 10)
+                    Spacer()
+                    
+                    
                 }
+                .padding(.top, 35)
             }
         }
     }

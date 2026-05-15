@@ -11,24 +11,22 @@ struct MemoryView: View {
     var day: Int
 
     var body: some View {
-        GeometryReader { geo in
-            VStack {
-                ZStack {
-                    Text("\(day)")
-                        .foregroundStyle(.white)
-                        .zIndex(1)
+        ZStack {
+            Text("\(day)")
+                .foregroundStyle(.white)
+                .zIndex(1)
 
-                    Image("back")
-                        .resizable()
-                        .frame(width: geo.size.width / 8, height: 70)
-                        .cornerRadius(6)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.white, lineWidth: 1.5)
-
-                        )
+            Image("back")
+                .resizable()
+                .containerRelativeFrame(.horizontal) { width, _ in
+                    width / 8
                 }
-            }
+                .frame(height: 70)
+                .cornerRadius(6)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(.white, lineWidth: 1)
+                )
         }
         .frame(height: 70)
     }
@@ -37,4 +35,3 @@ struct MemoryView: View {
 #Preview {
     MemoryView(day: 1)
 }
-
