@@ -158,13 +158,10 @@ struct Settings: View {
                                     .buttonStyle(.plain)
                                     
                                     
-                                    Rectangle()
-                                        .containerRelativeFrame(.horizontal) { width, _ in
-                                            width * 0.9
-                                        }
-                                        .frame(height: 0.4)
-                                        .opacity(0.4)
-                                        .foregroundStyle(.gray)
+                                    DividerLine()
+                                        
+                                    
+                                       
                                     
                                     NavigationLink {
                                         Text("Time Zone Screen")
@@ -191,13 +188,8 @@ struct Settings: View {
                                     .buttonStyle(.plain)
                                     
                                     
-                                    Rectangle()
-                                        .containerRelativeFrame(.horizontal) { width, _ in
-                                            width * 0.9
-                                        }
-                                        .frame(height: 0.4)
-                                        .opacity(0.4)
-                                        .foregroundStyle(.gray)
+                                   DividerLine()
+                                       
                                     
                                     NavigationLink {
                                         Text("Other View")
@@ -267,13 +259,8 @@ struct Settings: View {
                                     .buttonStyle(.plain)
                                     
                                     
-                                    Rectangle()
-                                        .containerRelativeFrame(.horizontal) { width, _ in
-                                            width * 0.9
-                                        }
-                                        .frame(height: 0.5)
-                                        .opacity(0.4)
-                                        .foregroundStyle(.gray)
+                                   DividerLine()
+                                        
                                     
                                     NavigationLink {
                                         Text("Rating View")
@@ -300,13 +287,8 @@ struct Settings: View {
                                     .buttonStyle(.plain)
                                     
                                     
-                                    Rectangle()
-                                        .containerRelativeFrame(.horizontal) { width, _ in
-                                            width * 0.9
-                                        }
-                                        .frame(height: 0.4)
-                                        .opacity(0.4)
-                                        .foregroundStyle(.gray)
+                                    DividerLine()
+
                                     
                                     NavigationLink {
                                         Text("Help View")
@@ -332,13 +314,8 @@ struct Settings: View {
                                     }
                                     .buttonStyle(.plain)
                                     
-                                    Rectangle()
-                                        .containerRelativeFrame(.horizontal) { width, _ in
-                                            width * 0.9
-                                        }
-                                        .frame(height: 0.4)
-                                        .opacity(0.4)
-                                        .foregroundStyle(.gray)
+                                    DividerLine()
+
                                     
                                     NavigationLink {
                                         Text("About view")

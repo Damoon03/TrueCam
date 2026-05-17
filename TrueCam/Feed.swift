@@ -107,7 +107,6 @@ struct Feed: View {
         }
     }
 }
-
 #Preview {
     Feed()
 }
