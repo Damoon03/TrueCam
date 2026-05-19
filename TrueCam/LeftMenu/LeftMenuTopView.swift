@@ -13,20 +13,23 @@ struct LeftMenuTopView: View {
     @State var isEditing = true
     
     var body: some View {
-        ZStack {
-            HStack {
-                Spacer()
-                Image(systemName: "arror.forward")
+        VStack {
+            ZStack {
+                HStack {
+                    Spacer()
+                    Image(systemName: "arrow.forward")
+                        .foregroundStyle(.white)
+                    
+                }
+                Text("TrueCam.")
                     .foregroundStyle(.white)
-                
+                    .fontWeight(.bold)
+                    .font(.system(size: 22))
             }
-            Text("TrueCam.")
-                .foregroundStyle(.white)
-                .fontWeight(.bold)
-                .font(.system(size: 22))
+            SearchBar(text: $text)
+                    Spacer()
         }
-        SearchBar(text: $text)
-        Spacer()
+        
     }
 }
 
