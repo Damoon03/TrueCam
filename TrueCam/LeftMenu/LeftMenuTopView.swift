@@ -11,15 +11,22 @@ struct LeftMenuTopView: View {
     
     @State var text = ""
     @State var isEditing = true
-    
+    @Binding var selection: Int
+
     var body: some View {
         VStack {
             ZStack {
                 HStack {
                     Spacer()
-                    Image(systemName: "arrow.forward")
-                        .foregroundStyle(.white)
                     
+                    Button {
+                        withAnimation(.spring()) {
+                            selection = 1
+                        }
+                    } label: {
+                        Image(systemName: "arrow.forward")
+                            .foregroundStyle(.white)
+                    }
                 }
                 Text("TrueCam.")
                     .foregroundStyle(.white)
@@ -34,5 +41,5 @@ struct LeftMenuTopView: View {
 }
 
 #Preview {
-    LeftMenuTopView()
+    LeftMenuTopView(selection: .constant(1))
 }

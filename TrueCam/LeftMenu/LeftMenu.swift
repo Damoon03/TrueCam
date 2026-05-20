@@ -10,12 +10,14 @@ import SwiftUI
 struct LeftMenu: View {
     
     @State var menu = "suggestions"
+    @Binding var selection: Int
+
     
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
             
-            LeftMenuTopView()
+            LeftMenuTopView(selection: $selection)
             
             if menu == "suggestions" {
                 Suggestions()
@@ -108,5 +110,5 @@ struct LeftMenu: View {
 }
 
 #Preview {
-    LeftMenu()
+    LeftMenu(selection: .constant(0))
 }

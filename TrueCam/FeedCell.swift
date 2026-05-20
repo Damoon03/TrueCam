@@ -47,17 +47,18 @@ struct FeedCell: View {
                             Spacer()
                         
                             VStack {
-                                
-                                Image(systemName: "bubble.left.fill")
-                                    .foregroundStyle(Color.white)
-                                    .font(.system(size: 25))
-                                    .shadow(color: .black, radius: 3,x: 1,y: 1)
-                                
                                 Image(systemName: "heart.fill")
                                     .foregroundStyle(Color.white)
                                     .font(.system(size: 25))
                                     .shadow(color: .black, radius: 3,x: 1,y: 1)
+
+                                Image(systemName: "bubble.left.fill")
+                                    .foregroundStyle(Color.white)
+                                    .font(.system(size: 21))
+                                    .shadow(color: .black, radius: 3,x: 1,y: 1)
                                     .padding(.top, 10)
+
+                                
                             }
                             .padding(.trailing, 20)
                             .padding(.bottom, 35)

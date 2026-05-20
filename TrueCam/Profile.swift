@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct Profile: View {
+    
+    @Binding var selection: Int
+    
     var body: some View {
         VStack {
             ZStack {
@@ -16,10 +19,15 @@ struct Profile: View {
                 
                 VStack {
                     HStack {
-                        Image(systemName: "arrow.backward")
-                            .foregroundStyle(Color.white)
-                            .font(.system(size: 20))
-                        
+                        Button {
+                            withAnimation(.spring()) {
+                                selection = 1
+                            }
+                        } label: {
+                            Image(systemName: "arrow.backward")
+                                .foregroundStyle(Color.white)
+                                .font(.system(size: 20))
+                        }
                         Spacer()
                         
                         Text("Profile")
@@ -137,5 +145,5 @@ struct Profile: View {
 }
 
 #Preview {
-    Profile()
+    Profile(selection: .constant(2))
 }

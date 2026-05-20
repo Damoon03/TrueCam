@@ -1,5 +1,5 @@
 //
-//  Feed.swift
+//  FeedView.swift
 //  TrueCam
 //
 //  Created by Damoon saber on 2/20/1405 AP.
@@ -7,7 +7,10 @@
 
 import SwiftUI
 
-struct Feed: View {
+struct FeedView: View {
+    
+    @Binding var selection: Int
+    
     var body: some View {
         ZStack {
             Color.black
@@ -72,8 +75,15 @@ struct Feed: View {
                 VStack {
                     VStack {
                         HStack {
-                            Image(systemName: "person.2.fill")
-                                .foregroundColor(.white)
+                            Button {
+                                withAnimation(.spring()) {
+                                    selection = 0
+                                }
+                            } label: {
+                                Image(systemName: "person.2.fill")
+                                    .foregroundStyle(.white)
+                                    .font(.system(size: 20))
+                            }
                             
                             Spacer()
                             
@@ -84,12 +94,16 @@ struct Feed: View {
                             
                             Spacer()
                             
-                            Image("profile")
-                                .resizable()
-                                .frame(width: 35, height: 35)
-                                .cornerRadius(17.5)
-                            
-                            
+                            Button {
+                                withAnimation(.spring()) {
+                                    selection = 2
+                                }
+                            } label: {
+                                Image("profile")
+                                    .resizable()
+                                    .frame(width: 35, height: 35)
+                                    .cornerRadius(17.5)
+                            }
                         }
                         .padding(.horizontal)
                         
@@ -108,5 +122,5 @@ struct Feed: View {
     }
 }
 #Preview {
-    Feed()
+    FeedView(selection: .constant(1))
 }
