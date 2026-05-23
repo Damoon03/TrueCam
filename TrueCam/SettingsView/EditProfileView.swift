@@ -1,5 +1,5 @@
 //
-//  EditProfile.swift
+//  EditProfileView.swift
 //  TrueCam
 //
 //  Created by Damoon saber on 2/27/1405 AP.
@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-struct EditProfile: View {
+struct EditProfileView: View {
     
     @State var fullname = ""
     @State var username = ""
     @State var bio = ""
     @State var location = ""
-
+    @Environment(\.dismiss) var dismiss
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -22,8 +22,13 @@ struct EditProfile: View {
                 // MARK: Header
                 ZStack {
                     HStack {
-                        Text("Cancel")
-                            .foregroundStyle(.white)
+                        Button {
+                            dismiss()
+                        } label: {
+                            Text("Cancel")
+                                .foregroundStyle(.white)
+                        }
+
                         Spacer()
                         Text("Save")
                             .foregroundStyle(.gray)
@@ -111,5 +116,5 @@ struct EditProfile: View {
 }
 
 #Preview {
-    EditProfile()
+    EditProfileView()
 }

@@ -1,5 +1,5 @@
 //
-//  ContactUs.swift
+//  ContactUsView.swift
 //  TrueCam
 //
 //  Created by Damoon saber on 3/1/1405 AP.
@@ -7,7 +7,10 @@
 
 import SwiftUI
 
-struct ContactUs: View {
+struct ContactUsView: View {
+    
+    @Environment(\.dismiss) var dismiss
+    
     var body: some View {
         VStack {
             ZStack {
@@ -21,12 +24,18 @@ struct ContactUs: View {
                             .fontWeight(.semibold)
                         
                         HStack {
-                            Image(systemName: "arrow.backward")
-                                .foregroundStyle(.white)
-                                .font(.system(size: 20))
+                            Button {
+                                dismiss()
+                            } label: {
+                                Image(systemName: "arrow.backward")
+                                    .foregroundStyle(.white)
+                                    .font(.system(size: 20))
+                            }
+
                             
                             Spacer()
                         }
+                        .padding(.horizontal)
                     }
                     
                     Spacer()
@@ -83,5 +92,5 @@ struct ContactUs: View {
 }
 
 #Preview {
-    ContactUs()
+    ContactUsView()
 }

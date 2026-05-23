@@ -1,5 +1,5 @@
 //
-//  Settings.swift
+//  SettingsView.swift
 //  TrueCam
 //
 //  Created by Damoon saber on 2/25/1405 AP.
@@ -7,7 +7,10 @@
 
 import SwiftUI
 
-struct Settings: View {
+struct SettingsView: View {
+    
+    @Environment(\.dismiss) var dismiss
+
     var body: some View {
         
         NavigationStack {
@@ -26,9 +29,14 @@ struct Settings: View {
                             .multilineTextAlignment(.center)
                         
                         HStack {
-                            Image(systemName: "arrow.backward")
-                                .font(.system(size: 20))
-                                .foregroundStyle(.white)
+                            
+                            Button {
+                                dismiss()
+                            } label: {
+                                Image(systemName: "arrow.backward")
+                                    .font(.system(size: 20))
+                                    .foregroundStyle(.white)
+                            }
                             
                             Spacer()
                         }
@@ -39,8 +47,8 @@ struct Settings: View {
                     // MARK: - Profile Card
                     VStack {
                         NavigationLink{
-                            Text("Profile view")}
-                        label: {
+                            EditProfileView().navigationBarBackButtonHidden()
+                        } label: {
                             RoundedRectangle(cornerRadius: 16)
                                 .foregroundStyle(.white.opacity(0.07))
                                 .containerRelativeFrame(.horizontal) { width, _ in
@@ -87,7 +95,7 @@ struct Settings: View {
                             .padding(.horizontal, 22)
                         
                         NavigationLink{
-                            Text("Memories view")
+                            MemoriesView().navigationBarBackButtonHidden()
                         } label: {
                             RoundedRectangle(cornerRadius: 10)
                                 .foregroundStyle(.white.opacity(0.07))
@@ -134,7 +142,7 @@ struct Settings: View {
                             .overlay(
                                 VStack {
                                     NavigationLink {
-                                        Text("Notifications Screen")
+                                        NotificationsView().navigationBarBackButtonHidden()
                                     } label: {
                                         HStack {
                                             Image(systemName: "square.and.pencil")
@@ -164,7 +172,7 @@ struct Settings: View {
                                        
                                     
                                     NavigationLink {
-                                        Text("Time Zone Screen")
+                                        TimeZoneView().navigationBarBackButtonHidden()
                                     } label: {
                                         HStack {
                                             Image(systemName: "globe.europe.africa.fill")
@@ -192,7 +200,7 @@ struct Settings: View {
                                        
                                     
                                     NavigationLink {
-                                        Text("Other View")
+                                        OtherView().navigationBarBackButtonHidden()
                                     } label: {
                                         HStack {
                                             Image(systemName: "hammer.circle")
@@ -291,7 +299,7 @@ struct Settings: View {
 
                                     
                                     NavigationLink {
-                                        Text("Help View")
+                                        HelpView().navigationBarBackButtonHidden()
                                     } label: {
                                         HStack {
                                             Image(systemName: "lifepreserver")
@@ -368,5 +376,5 @@ struct Settings: View {
 }
 
 #Preview {
-    Settings()
+    SettingsView()
 }
