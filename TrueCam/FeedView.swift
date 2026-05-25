@@ -87,10 +87,11 @@ struct FeedView: View {
                             
                             Spacer()
                             
-                            Text("TrueCam")
-                                .foregroundStyle(Color(.white))
-                                .fontWeight(.semibold)
+                            Text("TrueCam.")
+                                .foregroundStyle(.white)
                                 .font(.system(size: 22))
+                                .font(.caption.bold())
+                                .kerning(2)
                             
                             Spacer()
                             

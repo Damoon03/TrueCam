@@ -28,10 +28,12 @@ struct LeftMenuTopView: View {
                             .foregroundStyle(.white)
                     }
                 }
+                .padding(.horizontal)
                 Text("TrueCam.")
                     .foregroundStyle(.white)
-                    .fontWeight(.bold)
                     .font(.system(size: 22))
+                    .font(.caption.bold())
+                    .kerning(2)
             }
             SearchBar(text: $text)
                     Spacer()
