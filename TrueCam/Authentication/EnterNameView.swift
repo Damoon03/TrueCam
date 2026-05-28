@@ -30,7 +30,7 @@ struct EnterNameView: View {
                     HStack {
                         Spacer()
                         Text("let's get started, What's your name?")
-                            .font(.system(size: 20, weight: .bold, design: .default))
+                            .font(.system(size: 16, weight: .bold, design: .default))
                             .foregroundStyle(.white)
                             .lineLimit(1)
                         Spacer()
@@ -42,10 +42,13 @@ struct EnterNameView: View {
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(.secondarySystemBackground).opacity(0.1))
-                                .stroke(isFocused ? Color.white.opacity(0.5) : Color.white.opacity(0.1), lineWidth: 1)
-                                .frame(width: 200 ,height: 50)
+                                .fill(Color.white.opacity(0.05))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(isFocused ? Color.white : Color.white.opacity(0.15), lineWidth: 1)
+                                )
                         )
+                        .animation(.snappy, value: isFocused)
                         .foregroundStyle(.white)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 80)
