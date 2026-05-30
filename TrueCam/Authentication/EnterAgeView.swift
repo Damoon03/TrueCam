@@ -14,6 +14,10 @@ struct EnterAgeView: View {
     
     @State private var showAgeError = false
     
+    @Binding var age: String
+    let onConfirm: () -> Void
+
+    
     let days = Array(1...31)
     let months = Array(1...12)
     let years = Array(1950...Calendar.current.component(.year, from: Date()))
@@ -116,11 +120,13 @@ struct EnterAgeView: View {
                         if isOldEnough {
                             print("Access granted: \(selectedDay)-\(selectedMonth)-\(selectedYear)")
                             showAgeError = false
+                            onConfirm()
                         } else {
                             withAnimation(.easeInOut) {
                                 showAgeError = true
                             }
                         }
+                        
                     }) {
                         Text("CONFIRM")
                             .font(.caption.bold())
@@ -156,5 +162,5 @@ struct EnterAgeView: View {
 
 
 #Preview {
-    EnterAgeView()
+    EnterAgeView(age: .constant(""), onConfirm: {})
 }

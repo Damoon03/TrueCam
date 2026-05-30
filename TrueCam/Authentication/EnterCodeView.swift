@@ -19,6 +19,9 @@ struct EnterCodeView: View {
     @State private var canResend = false
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
+    @Binding var Code: String
+    let onConfirm: () -> Void
+    
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -65,6 +68,7 @@ struct EnterCodeView: View {
                     if code.count == codeLength {
                         Button(action: {
                             print("Verifying Code: \(code)")
+                            onConfirm()
                         }) {
                             Text("CONFIRM")
                                 .font(.caption.bold())
@@ -147,5 +151,5 @@ struct EnterCodeView: View {
 }
 
 #Preview {
-    EnterCodeView()
+    EnterCodeView(Code: .constant(""), onConfirm: {})
 }

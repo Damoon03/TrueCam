@@ -7,36 +7,39 @@
 import SwiftUI
 
 struct EnterNameView: View {
-    @State private var name = ""
-    @FocusState private var isFocused: Bool
     
+    @Binding var name: String
+    let onConfirm: () -> Void
+
+    @FocusState private var isFocused: Bool
+
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            
+
             VStack {
                 HStack {
                     Spacer()
-                    
                     Text("TrueCam.")
                         .foregroundStyle(.white)
                         .font(.system(size: 22))
                         .font(.caption.bold())
                         .kerning(2)
-
                     Spacer()
                 }
+
                 VStack(spacing: 40) {
                     HStack {
                         Spacer()
                         Text("let's get started, What's your name?")
-                            .font(.system(size: 16, weight: .bold, design: .default))
+                            .font(.system(size: 16, weight: .bold))
                             .foregroundStyle(.white)
                             .lineLimit(1)
                         Spacer()
                     }
-                    
-                    TextField("", text: $name, prompt: Text("Enter name...").foregroundStyle(.white.opacity(0.2)))
+
+                    TextField("", text: $name,
+                              prompt: Text("Enter name...").foregroundStyle(.white.opacity(0.2)))
                         .focused($isFocused)
                         .font(.system(size: 16, weight: .medium))
                         .padding()
@@ -48,14 +51,15 @@ struct EnterNameView: View {
                                         .stroke(isFocused ? Color.white : Color.white.opacity(0.15), lineWidth: 1)
                                 )
                         )
-                        .animation(.snappy, value: isFocused)
                         .foregroundStyle(.white)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 80)
                         .animation(.snappy, value: isFocused)
-                    
+
                     if !name.isEmpty {
-                        Button(action: {  }) {
+                        Button(action: {
+                            onConfirm()
+                        }) {
                             Text("CONFIRM")
                                 .font(.caption.bold())
                                 .kerning(2)
@@ -65,17 +69,20 @@ struct EnterNameView: View {
                                 .foregroundStyle(.black)
                                 .cornerRadius(5)
                         }
-                        .transition(.opacity.animation(.easeIn))
+                        .transition(.opacity)
                     }
                 }
                 .padding(.top, 100)
+
                 Spacer()
             }
         }
+        .onAppear { isFocused = true }
+        .animation(.snappy, value: name.isEmpty)
     }
 }
 
 
 #Preview {
-    EnterNameView()
+EnterNameView(name: .constant(""), onConfirm: {})
 }

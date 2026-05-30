@@ -12,6 +12,9 @@ struct EnterPhoneNumberView: View {
     @State private var showCountryList = false
     @State private var phoneNumber = ""
     @FocusState private var isFocused: Bool
+    
+    @Binding var number: String
+    let onConfirm: () -> Void
 
     var body: some View {
         NavigationStack {
@@ -90,6 +93,7 @@ struct EnterPhoneNumberView: View {
                         if !phoneNumber.isEmpty {
                             Button(action: {
                                 print("Confirming: +\(country.phoneCode)\(phoneNumber)")
+                                onConfirm()
                             }) {
                                 Text("CONFIRM")
                                     .font(.system(size: 12, weight: .bold))
@@ -122,5 +126,5 @@ struct EnterPhoneNumberView: View {
 }
 
 #Preview {
-    EnterPhoneNumberView()
+    EnterPhoneNumberView(number: .constant(""), onConfirm: {})
 }
