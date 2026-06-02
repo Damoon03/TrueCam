@@ -102,6 +102,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				CEAAF5672FC605DA007FA49B /* XCRemoteSwiftPackageReference "CountryPicker" */,
+				CE4BA3802FCF322A00BD2A6C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CE497C772FB0CFE800DD9350 /* Products */;
@@ -366,6 +367,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		CE4BA3802FCF322A00BD2A6C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 12.14.0;
+			};
+		};
 		CEAAF5672FC605DA007FA49B /* XCRemoteSwiftPackageReference "CountryPicker" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mobven/CountryPicker.git";
