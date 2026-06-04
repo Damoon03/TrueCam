@@ -11,6 +11,7 @@ struct EnterPhoneNumberView: View {
     @State private var country = Country(phoneCode: "98", isoCode: "IR")
     @State private var showCountryList = false
     @FocusState private var isFocused: Bool
+    @StateObject var vm: AuthenticationViewModel
 
     @Binding var number: String
     let onConfirm: () -> Void
@@ -102,15 +103,20 @@ struct EnterPhoneNumberView: View {
                             print("Confirming: \(fullE164Like)")
                             onConfirm()
                         } label: {
-                            Text("CONFIRM")
-                                .font(.caption.bold())
-                                .kerning(2)
-                                .padding(.vertical, 12)
-                                .padding(.horizontal, 30)
-                                .background(Color.white)
-                                .foregroundStyle(.black)
-                                .cornerRadius(5)
+                            if vm.isSendingOTP {
+                                ProgressView()
+                            } else {
+                                Text("CONFIRM")
+                                    .font(.caption.bold())
+                                    .kerning(2)
+                                    .padding(.vertical, 12)
+                                    .padding(.horizontal, 30)
+                                    .background(Color.white)
+                                    .foregroundStyle(.black)
+                                    .cornerRadius(5)
+                            }
                         }
+                        .disabled(vm.isSendingOTP)
                         .padding(.horizontal, 30)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
@@ -130,6 +136,6 @@ struct EnterPhoneNumberView: View {
 }
 
 
-#Preview {
-    EnterPhoneNumberView(number: .constant(""), onConfirm: {})
-}
+//#Preview {
+//    EnterPhoneNumberView(vm: <#AuthenticationViewModel#>, number: .constant(""), onConfirm: {})
+//}

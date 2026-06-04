@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import FirebaseAuth
 
 enum AuthStep {
     case name
@@ -27,6 +28,12 @@ final class AuthenticationViewModel: ObservableObject {
     @Published var phone: String = ""
     @Published var code: String = ""
 
+    @Published var isSendingOTP = false
+    @Published var verificationID: String?
+    
+    @Published var authError: String?
+
+    
     var canConfirmName: Bool {
         !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -60,23 +67,56 @@ final class AuthenticationViewModel: ObservableObject {
         }
     }
 
-    func confirmPhone() {
-        guard canConfirmPhone else { return }
-        withAnimation(.snappy) {
-            step = .code
-        }
+    func confirmPhone() async {
+        await sendOTP()
     }
 
     func confirmCode() async {
+        guard let verificationID else { return }
         guard canConfirmCode else { return }
 
-        try? await Task.sleep(for: .milliseconds(700))
+        do {
+            let credential = PhoneAuthProvider.provider()
+                .credential(
+                    withVerificationID: verificationID,
+                    verificationCode: code
+                )
 
-        withAnimation(.snappy) {
-            step = .done
+            _ = try await Auth.auth().signIn(with: credential)
+
+            withAnimation(.snappy) {
+                step = .done
+            }
+
+            isLoggedIn = true
+
+        } catch {
+            authError = error.localizedDescription
         }
-
-        try? await Task.sleep(for: .milliseconds(400))
-        isLoggedIn = true
     }
+
+    
+    func sendOTP() async {
+        guard !isSendingOTP else { return }
+        guard canConfirmPhone else { return }
+
+        isSendingOTP = true
+        defer { isSendingOTP = false }
+
+        do {
+            let result = try await PhoneAuthProvider
+                .provider()
+                .verifyPhoneNumber(phone, uiDelegate: nil)
+
+            verificationID = result
+
+            withAnimation(.snappy) {
+                step = .code
+            }
+
+        } catch {
+            print("Failed to send OTP:", error)
+        }
+    }
+
 }

@@ -27,8 +27,10 @@ struct MainAuthenticationView: View {
                     }
 
                 case .phone:
-                    EnterPhoneNumberView(number: $vm.phone) {
-                        vm.confirmPhone()
+                    EnterPhoneNumberView(vm: vm, number: $vm.phone) {
+                        Task {
+                            await vm.confirmPhone()
+                        }
                     }
 
                 case .code:
@@ -43,6 +45,11 @@ struct MainAuthenticationView: View {
                         .foregroundStyle(.white)
                 }
             }
+        }
+        .alert("Error", isPresented: .constant(vm.authError != nil)) {
+            Button("OK") { vm.authError = nil }
+        } message: {
+            Text(vm.authError ?? "")
         }
     }
 }
