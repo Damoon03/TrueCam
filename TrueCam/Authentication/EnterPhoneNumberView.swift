@@ -11,18 +11,9 @@ struct EnterPhoneNumberView: View {
     @State private var country = Country(phoneCode: "98", isoCode: "IR")
     @State private var showCountryList = false
     @FocusState private var isFocused: Bool
-    @StateObject var vm: AuthenticationViewModel
-
-    @Binding var number: String
+    
+    @ObservedObject var vm: AuthenticationViewModel
     let onConfirm: () -> Void
-
-    private var digitsOnlyNumber: String {
-        number.filter { "0123456789".contains($0) }
-    }
-
-    private var fullE164Like: String {
-        "+\(country.phoneCode)\(digitsOnlyNumber)"
-    }
 
     var body: some View {
 
@@ -66,15 +57,16 @@ struct EnterPhoneNumberView: View {
 
                         TextField(
                             "",
-                            text: $number,
-                            prompt: Text("Your number").foregroundStyle(.white.opacity(0.2))
+                            text: $vm.phone,
+                            prompt: Text("Your number")
+                                .foregroundStyle(.white.opacity(0.2))
                         )
                         .focused($isFocused)
                         .keyboardType(.phonePad)
-                        .onChange(of: number) { _, newValue in
-                            let filtered = newValue.filter { "0123456789".contains($0) }
+                        .onChange(of: vm.phone) { _, newValue in
+                            let filtered = newValue.filter(\.isNumber)
                             if filtered != newValue {
-                                number = filtered
+                                vm.phone = filtered
                             }
                         }
                         .font(.system(size: 18, weight: .medium))
@@ -86,41 +78,52 @@ struct EnterPhoneNumberView: View {
                                 .fill(Color.white.opacity(0.05))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .stroke(isFocused ? Color.white : Color.white.opacity(0.15), lineWidth: 1)
+                                        .stroke(
+                                            isFocused ? Color.white : Color.white.opacity(0.15),
+                                            lineWidth: 1
+                                        )
                                 )
                         )
                         .animation(.snappy, value: isFocused)
                     }
                     .padding(.horizontal, 30)
 
-                    Text("By tapping \"CONFIRM\", you agree to our Privacy and Policy and \n Terms of Service.")
+                    Text("""
+                    By tapping "CONFIRM", you agree to our Privacy and Policy and
+                    Terms of Service.
+                    """)
                         .foregroundStyle(.gray)
                         .font(.caption)
                         .multilineTextAlignment(.center)
 
-                    if !digitsOnlyNumber.isEmpty {
-                        Button {
-                            print("Confirming: \(fullE164Like)")
-                            onConfirm()
-                        } label: {
-                            if vm.isSendingOTP {
-                                ProgressView()
-                            } else {
-                                Text("CONFIRM")
-                                    .font(.caption.bold())
-                                    .kerning(2)
-                                    .padding(.vertical, 12)
-                                    .padding(.horizontal, 30)
-                                    .background(Color.white)
-                                    .foregroundStyle(.black)
-                                    .cornerRadius(5)
-                            }
+                    Button {
+                        print("Confirming: \(vm.e164Phone)")
+                        onConfirm()
+                    } label: {
+                        if vm.isSendingOTP {
+                            ProgressView()
+                        } else {
+                            Text("CONFIRM")
+                                .font(.caption.bold())
+                                .kerning(2)
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 30)
+                                .background(
+                                    vm.canConfirmPhone
+                                    ? Color.white
+                                    : Color.white.opacity(0.3)
+                                )
+                                .foregroundStyle(.black)
+                                .cornerRadius(5)
                         }
-                        .disabled(vm.isSendingOTP)
-                        .padding(.horizontal, 30)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
+                    .disabled(!vm.canConfirmPhone || vm.isSendingOTP)
+                    .padding(.horizontal, 30)
+                    .animation(.snappy, value: vm.canConfirmPhone)
                 }
+            }
+            .onAppear {
+                vm.countryCode = country.phoneCode
             }
             .offset(y: -50)
         }
@@ -128,12 +131,14 @@ struct EnterPhoneNumberView: View {
             NavigationStack {
                 CountryPickerView(store: CountriesStore()) { selected in
                     country = selected
+                    vm.countryCode = selected.phoneCode
                 }
             }
             .presentationDetents([.medium, .large])
         }
     }
 }
+
 
 
 //#Preview {

@@ -27,7 +27,7 @@ struct MainAuthenticationView: View {
                     }
 
                 case .phone:
-                    EnterPhoneNumberView(vm: vm, number: $vm.phone) {
+                    EnterPhoneNumberView(vm: vm) {
                         Task {
                             await vm.confirmPhone()
                         }

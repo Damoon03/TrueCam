@@ -25,7 +25,7 @@ struct FeedCell: View {
                     VStack(alignment: .leading) {
                         Text("Damoon_che")
                             .foregroundStyle(Color.white)
-                            .fontWeight(.semibold)
+                      //      .fontWeight(.semibold)
                             .font(.system(size: 16))
                         
                         Text("Iran • 2h ago")

@@ -32,6 +32,9 @@ final class AuthenticationViewModel: ObservableObject {
     @Published var verificationID: String?
     
     @Published var authError: String?
+    
+    @Published var countryCode: String = "98"
+
 
     
     var canConfirmName: Bool {
@@ -94,7 +97,16 @@ final class AuthenticationViewModel: ObservableObject {
             authError = error.localizedDescription
         }
     }
-
+    
+    var e164Phone: String {
+        var clean = phone.filter(\.isNumber)
+        
+        if clean.hasPrefix("0") {
+            clean.removeFirst()
+        }
+        
+        return "+\(countryCode)\(clean)"
+    }
     
     func sendOTP() async {
         guard !isSendingOTP else { return }
@@ -106,17 +118,17 @@ final class AuthenticationViewModel: ObservableObject {
         do {
             let result = try await PhoneAuthProvider
                 .provider()
-                .verifyPhoneNumber(phone, uiDelegate: nil)
+                .verifyPhoneNumber(e164Phone, uiDelegate: nil)
 
             verificationID = result
 
             withAnimation(.snappy) {
                 step = .code
             }
-
+            
         } catch {
-            print("Failed to send OTP:", error)
+            authError = error.localizedDescription
+            
         }
     }
-
 }

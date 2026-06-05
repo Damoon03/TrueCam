@@ -20,11 +20,7 @@ struct ContentView: View {
     }
     
     @State var selection = 1
-    /*
-    @StateObject private var countriesStore = CountriesStore()
-    @State private var showPicker = false
-    @State private var selectedCountry: Country?
-    */
+   
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -44,16 +40,6 @@ struct ContentView: View {
              simpleSuccess()
              
              }
-            
-           /* Button(selectedCountry.map { "\($0.flag) \($0.displayDialCode)" } ?? "Select Country") {
-                showPicker = true
-            }
-            .sheet(isPresented: $showPicker) {
-                CountryPickerView(store: countriesStore) { country in
-                    selectedCountry = country
-                }
-            }
-            */
         }
         
     }
