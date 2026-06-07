@@ -37,6 +37,7 @@ final class AuthenticationViewModel: ObservableObject {
 
     @Published var userSession: FirebaseAuth.User?
     @Published var currentUser: User?
+    
 
     private var authListener: AuthStateDidChangeListenerHandle?
 

@@ -44,10 +44,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
 @main
 struct TrueCamApp: App {
+
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject var authVM = AuthenticationViewModel()
+
     var body: some Scene {
         WindowGroup {
-            MainAuthenticationView()
+            MainView()
+                .environmentObject(authVM)
         }
     }
 }

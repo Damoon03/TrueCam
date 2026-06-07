@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainAuthenticationView: View {
-    @StateObject private var vm = AuthenticationViewModel()
+    @EnvironmentObject var vm: AuthenticationViewModel
 
     var body: some View {
         NavigationStack {
