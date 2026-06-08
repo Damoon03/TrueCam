@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct FriendsView: View {
+    @EnvironmentObject var viewModel: AuthenticationViewModel
     var body: some View {
         VStack {
             ScrollView {
@@ -17,12 +18,22 @@ struct FriendsView: View {
                         .foregroundStyle(Color.Resolved(red: 40/255, green: 40/255, blue: 35/255))
                         .overlay(
                             HStack {
-                                
-                                Image("profile")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 40, height: 40)
-                                    .clipShape(Circle())
+                                if viewModel.currentUser?.profileImageUrl == nil {
+                                    Circle()
+                                        .frame(width: 40, height: 40)
+                                        .foregroundStyle(.gray.opacity(0.1))
+                                        .overlay(
+                                            Text(viewModel.currentUser?.name.prefix(1).uppercased() ?? "")
+                                                .foregroundStyle(.white)
+                                                .font(.system(size: 40 * 0.45, weight: .semibold))
+                                        )
+                                } else {
+                                    Image("profile")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 40, height: 40)
+                                        .clipShape(Circle())
+                                }
                                 
                                 VStack(alignment: .leading) {
                                     Text("Invite friends to TrueCam")

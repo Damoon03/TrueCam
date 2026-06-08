@@ -10,6 +10,7 @@ import SwiftUI
 struct SettingsView: View {
     
     @Environment(\.dismiss) var dismiss
+    @StateObject var vm = AuthenticationViewModel()
 
     var body: some View {
         
@@ -57,12 +58,23 @@ struct SettingsView: View {
                                 .frame(height: 90)
                                 .overlay(
                                     HStack {
-                                        Image("profile")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 60, height: 60)
-                                            .clipShape(Circle())
-                                        
+                                        if vm.currentUser?.profileImageUrl == nil {
+                                            Circle()
+                                                .frame(width: 60, height: 60)
+                                                .foregroundStyle(.gray.opacity(0.1))
+                                                .overlay(
+                                                    Text(vm.currentUser?.name.prefix(1).uppercased() ?? "")
+                                                        .foregroundStyle(.white)
+                                                        .font(.system(size: 60 * 0.45, weight: .semibold))
+                                                )
+                                        } else {
+                                            Image("profile")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 60, height: 60)
+                                                .clipShape(Circle())
+                                        }
+
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text("Damoon")
                                                 .foregroundStyle(.white)
@@ -354,15 +366,20 @@ struct SettingsView: View {
                             )
                     }
                     VStack() {
-                        RoundedRectangle(cornerRadius: 10)
-                            .foregroundStyle(.white.opacity(0.07))
-                            .containerRelativeFrame(.horizontal) { width, _ in
-                                width * 0.9
-                            }
-                            .frame(height: 45)
-                            .overlay(Text("Log Out")
-                                .foregroundStyle(Color.red)
-                            )
+                        Button {
+                            vm.signOut()
+                        } label: {
+                            RoundedRectangle(cornerRadius: 10)
+                                .foregroundStyle(.white.opacity(0.07))
+                                .containerRelativeFrame(.horizontal) { width, _ in
+                                    width * 0.9
+                                }
+                                .frame(height: 45)
+                                .overlay(Text("Log Out")
+                                    .foregroundStyle(Color.red)
+                                )
+                        }
+
                         Text("version 0.0.0 - production")
                             .foregroundStyle(Color.gray)
                             .font(.system(size: 12))

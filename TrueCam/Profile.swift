@@ -10,6 +10,7 @@ import SwiftUI
 struct Profile: View {
     
     @Binding var selection: Int
+    @EnvironmentObject var viewModel: AuthenticationViewModel
     
     var body: some View {
         NavigationStack {
@@ -52,11 +53,22 @@ struct Profile: View {
                     }
                     
                     VStack {
-                        Image("profile")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 130, height: 130)
-                            .cornerRadius(65)
+                        if viewModel.currentUser?.profileImageUrl == nil {
+                            Circle()
+                                .frame(width: 130, height: 130)
+                                .foregroundStyle(.gray.opacity(0.1))
+                                .overlay(
+                                    Text(viewModel.currentUser?.name.prefix(1).uppercased() ?? "")
+                                        .foregroundStyle(.white)
+                                        .font(.system(size: 130 * 0.45, weight: .semibold))
+                                )
+                        } else {
+                            Image("profile")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 130, height: 130)
+                                .clipShape(.circle)
+                        }
                         
                         Text("Damoon")
                             .foregroundStyle(Color.white)

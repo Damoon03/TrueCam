@@ -43,6 +43,13 @@ final class AuthenticationViewModel: ObservableObject {
 
     init() {
         setupAuthListener()
+        
+        if let user = Auth.auth().currentUser {
+            print("User exists:", user.uid)
+        } else {
+            print("No authenticated user")
+        }
+
     }
 
     deinit {
@@ -215,6 +222,16 @@ final class AuthenticationViewModel: ObservableObject {
 
         } catch {
             print("Fetch user error:", error.localizedDescription)
+        }
+    }
+    
+    func signOut() {
+        do {
+            try Auth.auth().signOut()
+            userSession = nil
+            currentUser = nil
+        } catch {
+            print(error.localizedDescription)
         }
     }
 }

@@ -11,6 +11,8 @@ struct FeedView: View {
     
     @Binding var selection: Int
     
+    @EnvironmentObject var viewModel: AuthenticationViewModel
+    
     var body: some View {
         ZStack {
             Color.black
@@ -100,10 +102,23 @@ struct FeedView: View {
                                     selection = 2
                                 }
                             } label: {
-                                Image("profile")
-                                    .resizable()
-                                    .frame(width: 35, height: 35)
-                                    .cornerRadius(17.5)
+                                
+                                if viewModel.currentUser?.profileImageUrl == nil {
+                                    Circle()
+                                        .frame(width: 35, height: 35)
+                                        .foregroundStyle(.gray.opacity(0.1))
+                                        .overlay(
+                                            Text(viewModel.currentUser?.name.prefix(1).uppercased() ?? "")
+                                                .foregroundStyle(.white)
+                                                .font(.system(size: 35 * 0.45, weight: .semibold))
+                                        )
+                                } else {
+                                    Image("profile")
+                                        .resizable()
+                                        .frame(width: 35, height: 35)
+                                        .clipShape(.circle)
+                                }
+                                
                             }
                         }
                         .padding(.horizontal)

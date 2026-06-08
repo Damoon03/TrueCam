@@ -20,6 +20,8 @@ struct ContentView: View {
     }
     
     @State var selection = 1
+    
+    @EnvironmentObject var viewModel: AuthenticationViewModel
    
     var body: some View {
         ZStack {

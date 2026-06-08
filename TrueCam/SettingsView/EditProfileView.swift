@@ -14,6 +14,8 @@ struct EditProfileView: View {
     @State var bio = ""
     @State var location = ""
     @Environment(\.dismiss) var dismiss
+    
+    @EnvironmentObject var viewModel: AuthenticationViewModel
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -44,11 +46,24 @@ struct EditProfileView: View {
                 
                 // MARK: Profile section
                 ZStack(alignment: .bottomTrailing) {
-                    Image("profile")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 120, height: 120)
-                        .clipShape(Circle())
+                    
+                    if viewModel.currentUser?.profileImageUrl == nil {
+                        Circle()
+                            .frame(width: 120, height: 120)
+                            .foregroundStyle(.gray.opacity(0.1))
+                            .overlay(
+                                Text(viewModel.currentUser?.name.prefix(1).uppercased() ?? "")
+                                    .foregroundStyle(.white)
+                                    .font(.system(size: 120 * 0.45, weight: .semibold))
+                            )
+                    } else {
+                        Image("profile")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 120, height: 120)
+                            .clipShape(Circle())
+                    }
+                    
                     
                     ZStack {
                         Circle().frame(width: 34, height: 34).foregroundStyle(.black)

@@ -54,6 +54,6 @@ struct MainAuthenticationView: View {
     }
 }
 
-#Preview {
-    MainAuthenticationView()
-}
+//#Preview {
+//    MainAuthenticationView()
+//}

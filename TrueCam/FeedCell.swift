@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct FeedCell: View {
+    @EnvironmentObject var viewModel: AuthenticationViewModel
+    
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -17,10 +19,22 @@ struct FeedCell: View {
                 // USERNAME
                 
                 HStack {
-                    Image("profile")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .cornerRadius(20)
+                    if viewModel.currentUser?.profileImageUrl == nil {
+                        Circle()
+                            .frame(width: 40, height: 40)
+                            .foregroundStyle(.gray.opacity(0.1))
+                            .overlay(
+                                Text(viewModel.currentUser?.name.prefix(1).uppercased() ?? "")
+                                    .foregroundStyle(.white)
+                                    .font(.system(size: 40 * 0.45, weight: .semibold))
+                            )
+                    } else {
+                        
+                        Image("profile")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                            .clipShape(.circle)
+                    }
                     
                     VStack(alignment: .leading) {
                         Text("Damoon_che")
