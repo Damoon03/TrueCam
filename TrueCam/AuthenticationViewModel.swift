@@ -144,6 +144,59 @@ final class AuthenticationViewModel: ObservableObject {
             authError = error.localizedDescription
         }
     }
+    
+    //MARK: - Edit Profile View
+    func updateUserProfile(
+        fullname: String,
+        username: String,
+        bio: String,
+        location: String
+    ) async throws {
+        
+        guard let uid = userSession?.uid else { return }
+        
+        let data: [String: Any] = [
+            "name": fullname,
+            "username": username,
+            "bio": bio,
+            "location": location
+        ]
+        
+        try await Firestore.firestore()
+            .collection("users")
+            .document(uid)
+            .updateData(data)
+        
+        currentUser?.name = fullname
+        currentUser?.username = username
+        currentUser?.bio = bio
+        currentUser?.location = location
+    }
+
+    @MainActor
+    func updateProfileImage(_ image: UIImage) async {
+        guard let uid = userSession?.uid else { return }
+        
+        do {
+            let imageUrl = try await ImageUploader.uploadImage(image, uid: uid)
+            
+            try await Firestore.firestore()
+                .collection("users")
+                .document(uid)
+                .updateData([
+                    "profileImageUrl": imageUrl
+                ])
+            
+            currentUser?.profileImageUrl = imageUrl
+            
+        } catch {
+            print("DEBUG: Failed to update profile image:", error.localizedDescription)
+        }
+    
+
+    }
+
+
 
     // MARK: - Phone Formatting
 

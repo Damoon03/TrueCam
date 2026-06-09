@@ -11,6 +11,7 @@ struct SettingsView: View {
     
     @Environment(\.dismiss) var dismiss
     @StateObject var vm = AuthenticationViewModel()
+    @EnvironmentObject var viewModel: AuthenticationViewModel
 
     var body: some View {
         
@@ -48,7 +49,8 @@ struct SettingsView: View {
                     // MARK: - Profile Card
                     VStack {
                         NavigationLink{
-                            EditProfileView().navigationBarBackButtonHidden()
+                            EditProfileView(currentUser:viewModel.currentUser!)
+                                .navigationBarBackButtonHidden()
                         } label: {
                             RoundedRectangle(cornerRadius: 16)
                                 .foregroundStyle(.white.opacity(0.07))

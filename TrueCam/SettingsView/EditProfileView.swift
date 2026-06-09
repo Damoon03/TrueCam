@@ -6,16 +6,42 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct EditProfileView: View {
     
-    @State var fullname = ""
-    @State var username = ""
-    @State var bio = ""
-    @State var location = ""
+    @State private var fullname: String
+    @State private var username: String
+    @State private var bio: String
+    @State private var location: String
+
     @Environment(\.dismiss) var dismiss
     
     @EnvironmentObject var viewModel: AuthenticationViewModel
+    
+    @State private var selectedItem: PhotosPickerItem?
+    @State private var profileImage: Image?
+    @State private var uiImage: UIImage?
+
+    
+    let currentUser: User
+    
+    init(currentUser: User) {
+        self.currentUser = currentUser
+        
+        _fullname = State(initialValue: currentUser.name)
+        _username = State(initialValue: currentUser.username ?? "")
+        _bio = State(initialValue: currentUser.bio ?? "")
+        _location = State(initialValue: currentUser.location ?? "")
+    }
+    private var hasChanges: Bool {
+        fullname != currentUser.name ||
+        username != (currentUser.username ?? "") ||
+        bio != (currentUser.bio ?? "") ||
+        location != (currentUser.location ?? "") ||
+        uiImage != nil
+    }
+
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -32,8 +58,34 @@ struct EditProfileView: View {
                         }
 
                         Spacer()
-                        Text("Save")
-                            .foregroundStyle(.gray)
+                    
+                        Button {
+                            Task {
+                                do {
+                                    try await viewModel.updateUserProfile(
+                                        fullname: fullname,
+                                        username: username,
+                                        bio: bio,
+                                        location: location
+                                    )
+                                    
+                                    if let uiImage {
+                                        await viewModel.updateProfileImage(uiImage)
+                                    }
+                                    
+                                    dismiss()
+                                } catch {
+                                    print("Update error:", error.localizedDescription)
+                                }
+                            }
+                        } label: {
+                            Text("Save")
+                                .foregroundStyle(.white)
+                                .fontWeight(.semibold)
+                        }
+                        .disabled(!hasChanges)
+                        .opacity(hasChanges ? 1 : 0.5)
+
                     }
                     .padding(.horizontal)
                     
@@ -45,38 +97,78 @@ struct EditProfileView: View {
                 DividerLine()
                 
                 // MARK: Profile section
-                ZStack(alignment: .bottomTrailing) {
-                    
-                    if viewModel.currentUser?.profileImageUrl == nil {
-                        Circle()
-                            .frame(width: 120, height: 120)
-                            .foregroundStyle(.gray.opacity(0.1))
-                            .overlay(
-                                Text(viewModel.currentUser?.name.prefix(1).uppercased() ?? "")
-                                    .foregroundStyle(.white)
-                                    .font(.system(size: 120 * 0.45, weight: .semibold))
-                            )
-                    } else {
-                        Image("profile")
-                            .resizable()
-                            .scaledToFit()
+                PhotosPicker(selection: $selectedItem, matching: .images) {
+                    ZStack(alignment: .bottomTrailing) {
+                        
+                        if let profileImage {
+                            profileImage
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 120, height: 120)
+                                .clipShape(Circle())
+                        } else if let imageUrl = currentUser.profileImageUrl,
+                                  let url = URL(string: imageUrl) {
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                            } placeholder: {
+                                Circle()
+                                    .fill(.gray.opacity(0.1))
+                            }
                             .frame(width: 120, height: 120)
                             .clipShape(Circle())
-                    }
-                    
-                    
-                    ZStack {
-                        Circle().frame(width: 34, height: 34).foregroundStyle(.black)
-                        Circle().frame(width: 30, height: 30).foregroundStyle(.white)
-                        Circle().frame(width: 30, height: 30).foregroundStyle(.black.opacity(0.1))
-                        
-                        Image(systemName: "camera.fill")
-                            .font(.system(size: 16))
-                            .shadow(color: .white, radius: 1)
+                        } else {
+                            Circle()
+                                .frame(width: 120, height: 120)
+                                .foregroundStyle(.gray.opacity(0.1))
+                                .overlay(
+                                    Text(currentUser.name.prefix(1).uppercased())
+                                        .foregroundStyle(.white)
+                                        .font(.system(size: 120 * 0.45, weight: .semibold))
+                                )
+                        }
+
+                        ZStack {
+                            Circle()
+                                .frame(width: 34, height: 34)
+                                .foregroundStyle(.black)
+                            
+                            Circle()
+                                .frame(width: 30, height: 30)
+                                .foregroundStyle(.white)
+                            
+                            Circle()
+                                .frame(width: 30, height: 30)
+                                .foregroundStyle(.black.opacity(0.1))
+                            
+                            Image(systemName: "camera.fill")
+                                .font(.system(size: 16))
+                                .foregroundStyle(.black)
+                                .shadow(color: .white, radius: 1)
+                        }
                     }
                 }
                 .padding(.vertical, 20)
-                
+                .onChange(of: selectedItem) { _, newValue in
+                    Task {
+                        guard let data = try? await newValue?.loadTransferable(type: Data.self),
+                              let uiImage = UIImage(data: data) else {
+                            print("❌ Failed to load image data")
+                            return
+                        }
+
+                        print("✅ Image loaded")
+                        print("Size in bytes:", data.count)
+                        print("Dimensions:", uiImage.size)
+
+                        self.uiImage = uiImage
+                        self.profileImage = Image(uiImage: uiImage)
+                    }
+                }
+
+
+
                 DividerLine()
                 
                 // MARK: Form Section
@@ -130,6 +222,6 @@ struct EditProfileView: View {
     }
 }
 
-#Preview {
-    EditProfileView()
-}
+//#Preview {
+//    EditProfileView(currentUser: User.init(from: Constant.1))
+//}
