@@ -103,21 +103,31 @@ struct FeedView: View {
                                 }
                             } label: {
                                 
-                                if viewModel.currentUser?.profileImageUrl == nil {
+                                if let imageUrl = viewModel.currentUser?.profileImageUrl,
+                                   let url = URL(string: imageUrl) {
+                                    
+                                    AsyncImage(url: url) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                    } placeholder: {
+                                        Circle()
+                                            .foregroundStyle(.gray.opacity(0.1))
+                                    }
+                                    .frame(width: 35, height: 35)
+                                    .clipShape(Circle())
+
+                                } else {
                                     Circle()
                                         .frame(width: 35, height: 35)
                                         .foregroundStyle(.gray.opacity(0.1))
                                         .overlay(
                                             Text(viewModel.currentUser?.name.prefix(1).uppercased() ?? "")
                                                 .foregroundStyle(.white)
-                                                .font(.system(size: 35 * 0.45, weight: .semibold))
+                                                .font(.system(size: 60 * 0.45, weight: .semibold))
                                         )
-                                } else {
-                                    Image("profile")
-                                        .resizable()
-                                        .frame(width: 35, height: 35)
-                                        .clipShape(.circle)
                                 }
+
                                 
                             }
                         }
@@ -137,6 +147,7 @@ struct FeedView: View {
         }
     }
 }
+
 #Preview {
     FeedView(selection: .constant(1))
 }

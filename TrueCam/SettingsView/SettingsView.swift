@@ -60,7 +60,21 @@ struct SettingsView: View {
                                 .frame(height: 90)
                                 .overlay(
                                     HStack {
-                                        if vm.currentUser?.profileImageUrl == nil {
+                                        if let imageUrl = vm.currentUser?.profileImageUrl,
+                                           let url = URL(string: imageUrl) {
+                                            
+                                            AsyncImage(url: url) { image in
+                                                image
+                                                    .resizable()
+                                                    .scaledToFill()
+                                            } placeholder: {
+                                                Circle()
+                                                    .foregroundStyle(.gray.opacity(0.1))
+                                            }
+                                            .frame(width: 60, height: 60)
+                                            .clipShape(Circle())
+
+                                        } else {
                                             Circle()
                                                 .frame(width: 60, height: 60)
                                                 .foregroundStyle(.gray.opacity(0.1))
@@ -69,13 +83,8 @@ struct SettingsView: View {
                                                         .foregroundStyle(.white)
                                                         .font(.system(size: 60 * 0.45, weight: .semibold))
                                                 )
-                                        } else {
-                                            Image("profile")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 60, height: 60)
-                                                .clipShape(Circle())
                                         }
+
 
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text("Damoon")
@@ -394,6 +403,6 @@ struct SettingsView: View {
     }
 }
 
-#Preview {
-    SettingsView()
-}
+//#Preview {
+//    SettingsView()
+//}

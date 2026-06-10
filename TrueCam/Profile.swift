@@ -53,21 +53,29 @@ struct Profile: View {
                     }
                     
                     VStack {
-                        if viewModel.currentUser?.profileImageUrl == nil {
+                        if let imageUrl = viewModel.currentUser?.profileImageUrl,
+                           let url = URL(string: imageUrl) {
+                            
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                            } placeholder: {
+                                Circle()
+                                    .foregroundStyle(.gray.opacity(0.1))
+                            }
+                            .frame(width: 130, height: 130)
+                            .clipShape(Circle())
+
+                        } else {
                             Circle()
                                 .frame(width: 130, height: 130)
                                 .foregroundStyle(.gray.opacity(0.1))
                                 .overlay(
                                     Text(viewModel.currentUser?.name.prefix(1).uppercased() ?? "")
                                         .foregroundStyle(.white)
-                                        .font(.system(size: 130 * 0.45, weight: .semibold))
+                                        .font(.system(size: 60 * 0.45, weight: .semibold))
                                 )
-                        } else {
-                            Image("profile")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 130, height: 130)
-                                .clipShape(.circle)
                         }
                         
                         Text("Damoon")
@@ -163,6 +171,6 @@ struct Profile: View {
     }
 }
 
-#Preview {
-    Profile(selection: .constant(2))
-}
+//#Preview {
+//    Profile(selection: .constant(2))
+//}
