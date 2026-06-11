@@ -74,7 +74,7 @@ struct Profile: View {
                                 .overlay(
                                     Text(viewModel.currentUser?.name.prefix(1).uppercased() ?? "")
                                         .foregroundStyle(.white)
-                                        .font(.system(size: 60 * 0.45, weight: .semibold))
+                                        .font(.system(size: 130 * 0.45, weight: .semibold))
                                 )
                         }
                         

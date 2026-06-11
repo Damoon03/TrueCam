@@ -19,7 +19,21 @@ struct RequestsView: View {
                         .foregroundStyle(Color.Resolved(red: 40/255, green: 40/255, blue: 35/255))
                         .overlay(
                             HStack {
-                                if viewModel.currentUser?.profileImageUrl == nil {
+                                if let imageUrl = viewModel.currentUser?.profileImageUrl,
+                                   let url = URL(string: imageUrl) {
+                                    
+                                    AsyncImage(url: url) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                    } placeholder: {
+                                        Circle()
+                                            .foregroundStyle(.gray.opacity(0.1))
+                                    }
+                                    .frame(width: 40, height: 40)
+                                    .clipShape(Circle())
+
+                                } else {
                                     Circle()
                                         .frame(width: 40, height: 40)
                                         .foregroundStyle(.gray.opacity(0.1))
@@ -28,12 +42,6 @@ struct RequestsView: View {
                                                 .foregroundStyle(.white)
                                                 .font(.system(size: 40 * 0.45, weight: .semibold))
                                         )
-                                } else {
-                                    Image("profile")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 40, height: 40)
-                                        .clipShape(Circle())
                                 }
 
                                 VStack(alignment: .leading) {
