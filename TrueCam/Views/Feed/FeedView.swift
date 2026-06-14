@@ -2,152 +2,134 @@
 //  FeedView.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 2/20/1405 AP.
-//
 
 import SwiftUI
+import FirebaseAuth
 
 struct FeedView: View {
-    
     @Binding var selection: Int
-    
-    @EnvironmentObject var viewModel: AuthenticationViewModel
-    
+    @EnvironmentObject var authVM: AuthenticationViewModel
+    @StateObject private var feedVM = FeedViewModel()
+    @State private var selectedPost: Post?
+    @State private var showComments = false
+
     var body: some View {
         ZStack {
-            Color.black
-                .ignoresSafeArea()
+            Color.black.ignoresSafeArea()
+
             ZStack {
-                ScrollView {
-                    VStack {
-                        VStack {
-                            ZStack {
-                                VStack(alignment: .leading) {
-                                    Image("back")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .cornerRadius(5)
-                                }
-                                
-                                VStack {
-                                    HStack {
-                                        Image("front")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .border(.black)
-                                            .cornerRadius(2)
-                                            .frame(width: 20, height: 40)
-                                            .padding(.leading)
-                                        Spacer()
-                                        
-                                        
-                                    }
-                                    .padding(.top, 18)
-                                    Spacer()
-                                }
-                            }
-                            .frame(width: 100)
-                        }
-                        
-                        VStack { Text("Add a Caption...")
-                                .foregroundStyle(Color.white)
-                                .fontWeight(.semibold)
-                            
-                            Text("View Comment")
-                                .foregroundStyle(Color.gray)
-                            
-                            HStack {
-                                
-                                Text("Iran, Rasht • 2h ago")
-                                    .foregroundStyle(Color.gray)
-                                    .font(.system(size: 12))
-                                
-                                Image(systemName: "ellipsis")
-                                    .foregroundStyle(Color.gray)
-                            }
-                        }
-                        
-                        ForEach(1 ..< 8) { _ in
-                            FeedCell()
-                        }
+                if feedVM.isLoading {
+                    ProgressView()
+                        .tint(.white)
+                } else if feedVM.posts.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "photo.on.rectangle.angled")
+                            .font(.system(size: 40))
+                            .foregroundStyle(.white.opacity(0.3))
+                        Text("No posts yet")
+                            .foregroundStyle(.white.opacity(0.4))
+                        Text("Add friends to see their TrueCams")
+                            .foregroundStyle(.gray)
+                            .font(.caption)
                     }
-                    .padding(.top, 80)
+                } else {
+                    ScrollView {
+                        VStack {
+                            ForEach(feedVM.posts) { post in
+                                FeedCell(
+                                    post: post,
+                                    currentUID: authVM.userSession?.uid ?? "",
+                                    onLike: {
+                                        Task {
+                                            await feedVM.toggleLike(
+                                                post: post,
+                                                currentUID: authVM.userSession?.uid ?? ""
+                                            )
+                                        }
+                                    },
+                                    onComment: {
+                                        selectedPost = post
+                                        showComments = true
+                                    }
+                                )
+                            }
+                        }
+                        .padding(.top, 80)
+                    }
                 }
-                
+
+                // MARK: - Top bar
                 VStack {
                     VStack {
                         HStack {
                             Button {
-                                withAnimation(.spring()) {
-                                    selection = 0
-                                }
+                                withAnimation(.spring()) { selection = 0 }
                             } label: {
                                 Image(systemName: "person.2.fill")
                                     .foregroundStyle(.white)
                                     .font(.system(size: 20))
                             }
-                            
+
                             Spacer()
-                            
+
                             Text("TrueCam.")
                                 .foregroundStyle(.white)
                                 .font(.system(size: 22))
-                                .font(.caption.bold())
                                 .kerning(2)
-                            
+
                             Spacer()
-                            
+
                             Button {
-                                withAnimation(.spring()) {
-                                    selection = 2
-                                }
+                                withAnimation(.spring()) { selection = 2 }
                             } label: {
-                                
-                                if let imageUrl = viewModel.currentUser?.profileImageUrl,
-                                   let url = URL(string: imageUrl) {
-                                    
+                                if let url = authVM.currentUser?.profileImageUrl.flatMap({ URL(string: $0) }) {
                                     AsyncImage(url: url) { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
+                                        image.resizable().scaledToFill()
                                     } placeholder: {
-                                        Circle()
-                                            .foregroundStyle(.gray.opacity(0.1))
+                                        Circle().foregroundStyle(.gray.opacity(0.1))
                                     }
                                     .frame(width: 35, height: 35)
                                     .clipShape(Circle())
-
                                 } else {
                                     Circle()
                                         .frame(width: 35, height: 35)
                                         .foregroundStyle(.gray.opacity(0.1))
                                         .overlay(
-                                            Text(viewModel.currentUser?.name.prefix(1).uppercased() ?? "")
+                                            Text(authVM.currentUser?.name.prefix(1).uppercased() ?? "")
                                                 .foregroundStyle(.white)
-                                                .font(.system(size: 35 * 0.45, weight: .semibold))
+                                                .font(.system(size: 14, weight: .semibold))
                                         )
                                 }
-
-                                
                             }
                         }
                         .padding(.horizontal)
-                        
+
                         HStack {
                             Text("My Friends")
-                                .foregroundStyle(Color(.white))
-                            
+                                .foregroundStyle(.white)
                             Text("Discovery")
-                                .foregroundStyle(Color(.gray))
+                                .foregroundStyle(.gray)
                         }
                     }
                     Spacer()
                 }
             }
         }
+        .sheet(isPresented: $showComments) {
+            if let post = selectedPost {
+                CommentsView(post: post)
+                    .environmentObject(authVM)
+            }
+        }
+        .task {
+            if let user = authVM.currentUser {
+                await feedVM.fetchFeed(currentUser: user)
+            }
+        }
+        .onChange(of: authVM.currentUser?.id) { _, _ in
+            if let user = authVM.currentUser {
+                Task { await feedVM.fetchFeed(currentUser: user) }
+            }
+        }
     }
-}
-
-#Preview {
-    FeedView(selection: .constant(1))
 }
