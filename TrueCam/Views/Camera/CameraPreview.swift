@@ -2,11 +2,9 @@
 //  CameraPreview.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 3/21/1405 AP.
-//
 
 import SwiftUI
-import AVFoundation
+internal import AVFoundation
 
 struct CameraPreview: UIViewRepresentable {
     let session: AVCaptureSession
@@ -21,7 +19,6 @@ struct CameraPreview: UIViewRepresentable {
 
     func updateUIView(_ uiView: PreviewView, context: Context) {}
 }
-
 
 final class PreviewView: UIView {
     override class var layerClass: AnyClass {

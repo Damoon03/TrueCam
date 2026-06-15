@@ -2,11 +2,9 @@
 //  CameraManager.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 3/21/1405 AP.
-//
 
 import SwiftUI
-import AVFoundation
+internal import AVFoundation
 import UIKit
 import Combine
 
@@ -22,64 +20,41 @@ final class CameraManager: NSObject, ObservableObject {
     private let photoOutput = AVCapturePhotoOutput()
 
     private var currentInput: AVCaptureDeviceInput?
-    private var currentPosition: AVCaptureDevice.Position = .back
+    private var currentPosition: AVCaptureDevice.Position
 
-    override init() {
+    init(position: AVCaptureDevice.Position = .back) {
+        self.currentPosition = position
         super.init()
         checkPermissions()
     }
-
-    // MARK: - Permissions
 
     func checkPermissions() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             configureSession()
-
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
                 guard let self else { return }
                 DispatchQueue.main.async {
-                    if granted {
-                        self.configureSession()
-                    } else {
-                        self.permissionDenied = true
-                    }
+                    if granted { self.configureSession() }
+                    else { self.permissionDenied = true }
                 }
             }
-
-        case .denied, .restricted:
-            DispatchQueue.main.async { self.permissionDenied = true }
-
-        @unknown default:
+        default:
             DispatchQueue.main.async { self.permissionDenied = true }
         }
     }
 
-    // MARK: - Session setup
-
     func configureSession() {
         sessionQueue.async { [weak self] in
             guard let self else { return }
-
-            // Already configured — just (re)start
-            guard self.currentInput == nil else {
-                self.startSession()
-                return
-            }
+            guard self.currentInput == nil else { self.startSession(); return }
 
             self.session.beginConfiguration()
             self.session.sessionPreset = .photo
+            defer { self.session.commitConfiguration(); self.startSession() }
 
-            defer {
-                self.session.commitConfiguration()
-                self.startSession()
-            }
-
-            guard let device = self.getCamera(for: self.currentPosition) else {
-                print("DEBUG: No camera found for position \(self.currentPosition)")
-                return
-            }
+            guard let device = self.getCamera(for: self.currentPosition) else { return }
 
             do {
                 let input = try AVCaptureDeviceInput(device: device)
@@ -91,7 +66,7 @@ final class CameraManager: NSObject, ObservableObject {
                     self.session.addOutput(self.photoOutput)
                 }
             } catch {
-                print("DEBUG: Failed to configure camera input: \(error.localizedDescription)")
+                print("Camera config error:", error.localizedDescription)
             }
         }
     }
@@ -112,23 +87,17 @@ final class CameraManager: NSObject, ObservableObject {
         }
     }
 
-    // MARK: - Camera switching
-
     func switchCamera() {
         sessionQueue.async { [weak self] in
             guard let self, let currentInput = self.currentInput else { return }
-
             self.session.beginConfiguration()
             self.session.removeInput(currentInput)
-
             self.currentPosition = self.currentPosition == .back ? .front : .back
-
             guard let newDevice = self.getCamera(for: self.currentPosition) else {
                 self.session.addInput(currentInput)
                 self.session.commitConfiguration()
                 return
             }
-
             do {
                 let newInput = try AVCaptureDeviceInput(device: newDevice)
                 if self.session.canAddInput(newInput) {
@@ -136,24 +105,17 @@ final class CameraManager: NSObject, ObservableObject {
                     self.currentInput = newInput
                 } else {
                     self.session.addInput(currentInput)
-                    self.currentInput = currentInput
                 }
             } catch {
-                print("DEBUG: Failed to switch camera: \(error.localizedDescription)")
                 self.session.addInput(currentInput)
-                self.currentInput = currentInput
             }
-
             self.session.commitConfiguration()
         }
     }
 
-    // MARK: - Capture
     func capturePhoto() {
         sessionQueue.async { [weak self] in
             guard let self else { return }
-
-            // Use JPEG when available, fall back to the default format otherwise
             let settings: AVCapturePhotoSettings
             if self.photoOutput.availablePhotoCodecTypes.contains(.jpeg) {
                 settings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.jpeg])
@@ -165,32 +127,14 @@ final class CameraManager: NSObject, ObservableObject {
         }
     }
 
-    // MARK: - Helpers
-
     private func getCamera(for position: AVCaptureDevice.Position) -> AVCaptureDevice? {
         AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position)
     }
 }
 
-// MARK: - AVCapturePhotoCaptureDelegate
-
 extension CameraManager: AVCapturePhotoCaptureDelegate {
-    func photoOutput(_ output: AVCapturePhotoOutput,
-                     didFinishProcessingPhoto photo: AVCapturePhoto,
-                     error: Error?) {
-        if let error {
-            print("DEBUG: Error capturing photo: \(error.localizedDescription)")
-            return
-        }
-
-        guard let data = photo.fileDataRepresentation(),
-              let image = UIImage(data: data) else {
-            print("DEBUG: Failed to get image data from captured photo")
-            return
-        }
-
-        DispatchQueue.main.async {
-            self.capturedImage = image
-        }
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        guard let data = photo.fileDataRepresentation(), let image = UIImage(data: data) else { return }
+        DispatchQueue.main.async { self.capturedImage = image }
     }
 }
