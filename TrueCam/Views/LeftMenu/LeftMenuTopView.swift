@@ -2,15 +2,12 @@
 //  LeftMenuTopView.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 2/28/1405 AP.
-//
 
 import SwiftUI
 
 struct LeftMenuTopView: View {
-    
-    @State var text = ""
-    @State var isEditing = true
+
+    @Binding var searchText: String
     @Binding var selection: Int
 
     var body: some View {
@@ -18,7 +15,7 @@ struct LeftMenuTopView: View {
             ZStack {
                 HStack {
                     Spacer()
-                    
+
                     Button {
                         withAnimation(.spring()) {
                             selection = 1
@@ -29,19 +26,21 @@ struct LeftMenuTopView: View {
                     }
                 }
                 .padding(.horizontal)
+
                 Text("TrueCam.")
                     .foregroundStyle(.white)
                     .font(.system(size: 22))
                     .font(.caption.bold())
                     .kerning(2)
             }
-            SearchBar(text: $text)
-                    Spacer()
+
+            SearchBar(text: $searchText)
+
+            Spacer()
         }
-        
     }
 }
 
 #Preview {
-    LeftMenuTopView(selection: .constant(1))
+    LeftMenuTopView(searchText: .constant(""), selection: .constant(1))
 }

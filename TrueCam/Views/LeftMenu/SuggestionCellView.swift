@@ -2,63 +2,68 @@
 //  SuggestionCellView.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 2/29/1405 AP.
-//
 
 import SwiftUI
 
 struct SuggestionCellView: View {
+    let user: User
+    let onAdd: () -> Void
+    let onDismiss: () -> Void
+
     var body: some View {
         HStack {
-            Image("elliot")
-                .resizable()
-                .scaledToFit()
+            if let imageUrl = user.profileImageUrl, let url = URL(string: imageUrl) {
+                AsyncImage(url: url) { image in
+                    image.resizable().scaledToFill()
+                } placeholder: {
+                    Circle().foregroundStyle(.gray.opacity(0.1))
+                }
                 .frame(width: 65, height: 65)
                 .clipShape(Circle())
-            
+            } else {
+                Circle()
+                    .frame(width: 65, height: 65)
+                    .foregroundStyle(.gray.opacity(0.1))
+                    .overlay(
+                        Text(user.name.prefix(1).uppercased())
+                            .foregroundStyle(.white)
+                            .font(.system(size: 65 * 0.4, weight: .semibold))
+                    )
+            }
+
             VStack(alignment: .leading) {
-                Text("Elliot")
+                Text(user.name)
                     .foregroundStyle(.white)
                     .fontWeight(.semibold)
 
-                Text("Elliot_Alderson")
-                    .foregroundStyle(.gray)
-                    .padding(.top, -10)
-                
-                HStack {
-                    Image(systemName: "person.crop.circle")
+                if let username = user.username {
+                    Text(username)
                         .foregroundStyle(.gray)
-                        .font(.system(size: 14))
-                    
-                    Text("MrRobot")
-                        .foregroundStyle(.gray)
-                        .font(.system(size: 14))
-                        .padding(.leading, -4)
+                        .padding(.top, -10)
                 }
-                
             }
-            
+
             Spacer()
-            
-            RoundedRectangle(cornerRadius: 12)
-                .foregroundStyle(Color(red: 44/255, green: 44/255, blue: 46/255))
-                .frame(width: 45, height: 25)
-                .overlay(
-                    Text("ADD")
-                        .foregroundStyle(.white)
-                        .font(.system(size: 12))
-                        .fontWeight(.semibold)
-                )
-            Image(systemName: "xmark")
-                .foregroundStyle(.gray)
-                .font(.system(size: 16))
-                .padding(.leading, 6)
-            
+
+            Button(action: onAdd) {
+                RoundedRectangle(cornerRadius: 12)
+                    .foregroundStyle(Color(red: 44/255, green: 44/255, blue: 46/255))
+                    .frame(width: 45, height: 25)
+                    .overlay(
+                        Text("ADD")
+                            .foregroundStyle(.white)
+                            .font(.system(size: 12))
+                            .fontWeight(.semibold)
+                    )
+            }
+
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
+                    .foregroundStyle(.gray)
+                    .font(.system(size: 16))
+                    .padding(.leading, 6)
+            }
         }
         .padding(.horizontal)
     }
-}
-
-#Preview {
-    SuggestionCellView()
 }
