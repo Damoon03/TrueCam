@@ -2,23 +2,21 @@
 //  SearchBar.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 2/28/1405 AP.
-//
 
 import SwiftUI
 
 struct SearchBar: View {
-    
+
     @Binding var text: String
     @FocusState private var isFocused: Bool
-    
+
     var body: some View {
         HStack(spacing: 10) {
-            
+
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.gray)
-                
+
                 TextField("Add or search friends", text: $text)
                     .foregroundStyle(.white)
                     .focused($isFocused)
@@ -27,7 +25,7 @@ struct SearchBar: View {
             .frame(height: 50)
             .background(Color(red: 28/255, green: 28/255, blue: 30/255))
             .cornerRadius(10)
-            
+
             if isFocused {
                 Button("Cancel") {
                     text = ""
@@ -46,7 +44,6 @@ struct SearchBar: View {
     }
 }
 
-
 #Preview {
-    SearchBar(text: .constant("") )
+    SearchBar(text: .constant(""))
 }
