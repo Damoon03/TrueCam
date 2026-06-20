@@ -2,26 +2,23 @@
 //  SettingsView.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 2/25/1405 AP.
-//
 
 import SwiftUI
 
 struct SettingsView: View {
-    
+
     @Environment(\.dismiss) var dismiss
-    @StateObject var vm = AuthenticationViewModel()
     @EnvironmentObject var viewModel: AuthenticationViewModel
 
     var body: some View {
-        
+
         NavigationStack {
             ZStack {
                 Color.black
                     .ignoresSafeArea()
-                
+
                 VStack(spacing: 20) {
-                    
+
                     // MARK: - Header
                     ZStack {
                         Text("Settings")
@@ -29,9 +26,8 @@ struct SettingsView: View {
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .multilineTextAlignment(.center)
-                        
+
                         HStack {
-                            
                             Button {
                                 dismiss()
                             } label: {
@@ -39,76 +35,27 @@ struct SettingsView: View {
                                     .font(.system(size: 20))
                                     .foregroundStyle(.white)
                             }
-                            
+
                             Spacer()
                         }
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 40)
-                    
+
                     // MARK: - Profile Card
                     VStack {
-                        NavigationLink{
-                            EditProfileView(currentUser:viewModel.currentUser!)
-                                .navigationBarBackButtonHidden()
-                        } label: {
-                            RoundedRectangle(cornerRadius: 16)
-                                .foregroundStyle(.white.opacity(0.07))
-                                .containerRelativeFrame(.horizontal) { width, _ in
-                                    width * 0.9
-                                }
-                                .frame(height: 90)
-                                .overlay(
-                                    HStack {
-                                        if let imageUrl = vm.currentUser?.profileImageUrl,
-                                           let url = URL(string: imageUrl) {
-                                            
-                                            AsyncImage(url: url) { image in
-                                                image
-                                                    .resizable()
-                                                    .scaledToFill()
-                                            } placeholder: {
-                                                Circle()
-                                                    .foregroundStyle(.gray.opacity(0.1))
-                                            }
-                                            .frame(width: 60, height: 60)
-                                            .clipShape(Circle())
-
-                                        } else {
-                                            Circle()
-                                                .frame(width: 60, height: 60)
-                                                .foregroundStyle(.gray.opacity(0.1))
-                                                .overlay(
-                                                    Text(vm.currentUser?.name.prefix(1).uppercased() ?? "")
-                                                        .foregroundStyle(.white)
-                                                        .font(.system(size: 60 * 0.45, weight: .semibold))
-                                                )
-                                        }
-
-
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text("Damoon")
-                                                .foregroundStyle(.white)
-                                                .fontWeight(.semibold)
-                                                .font(.system(size: 18))
-                                            
-                                            Text("@damoon_che")
-                                                .foregroundStyle(.white.opacity(0.8))
-                                                .fontWeight(.semibold)
-                                                .font(.system(size: 14))
-                                        }
-                                        
-                                        Spacer()
-                                        
-                                        Image(systemName: "chevron.right")
-                                            .foregroundStyle(.gray)
-                                            .font(.system(size: 20))
-                                    }
-                                        .padding(.horizontal, 20)
-                                )
+                        if let currentUser = viewModel.currentUser {
+                            NavigationLink {
+                                EditProfileView(currentUser: currentUser)
+                                    .navigationBarBackButtonHidden()
+                            } label: {
+                                profileCard(for: currentUser)
+                            }
+                        } else {
+                            profileCardPlaceholder
                         }
                     }
-                    
+
                     // MARK: - Features Section
                     VStack(alignment: .leading, spacing: 8) {
                         Text("FEATURES")
@@ -116,8 +63,8 @@ struct SettingsView: View {
                             .fontWeight(.semibold)
                             .font(.system(size: 12))
                             .padding(.horizontal, 22)
-                        
-                        NavigationLink{
+
+                        NavigationLink {
                             MemoriesView().navigationBarBackButtonHidden()
                         } label: {
                             RoundedRectangle(cornerRadius: 10)
@@ -131,13 +78,13 @@ struct SettingsView: View {
                                         Image(systemName: "calendar")
                                             .foregroundStyle(.white)
                                             .font(.system(size: 16))
-                                        
+
                                         Text("Memories")
                                             .foregroundStyle(.white)
                                             .fontWeight(.semibold)
-                                        
+
                                         Spacer()
-                                        
+
                                         Image(systemName: "chevron.right")
                                             .foregroundStyle(.gray)
                                             .font(.system(size: 16))
@@ -147,15 +94,15 @@ struct SettingsView: View {
                         }
                     }
                     .padding(.top, 8)
-                    
-                    //MARK: - Settings Section
+
+                    // MARK: - Settings Section
                     VStack(alignment: .leading) {
                         Text("SETTINGS")
                             .foregroundStyle(.gray)
                             .fontWeight(.semibold)
                             .font(.system(size: 12))
                             .padding(.horizontal, 22)
-                        
+
                         RoundedRectangle(cornerRadius: 10)
                             .foregroundStyle(.white.opacity(0.07))
                             .containerRelativeFrame(.horizontal) { width, _ in
@@ -167,96 +114,39 @@ struct SettingsView: View {
                                     NavigationLink {
                                         NotificationsView().navigationBarBackButtonHidden()
                                     } label: {
-                                        HStack {
-                                            Image(systemName: "square.and.pencil")
-                                                .foregroundStyle(.white)
-                                                .font(.system(size: 16))
-                                            
-                                            Text("Notifications")
-                                                .foregroundStyle(.white)
-                                                .fontWeight(.semibold)
-                                            
-                                            Spacer()
-                                            
-                                            Image(systemName: "chevron.right")
-                                                .foregroundStyle(.gray)
-                                                .font(.system(size: 16))
-                                        }
-                                        .padding(.horizontal, 24)
-                                        .frame(height: 30)
-                                        .contentShape(Rectangle())
+                                        settingsRow(icon: "square.and.pencil", title: "Notifications", height: 30)
                                     }
                                     .buttonStyle(.plain)
-                                    
-                                    
+
                                     DividerLine()
-                                        
-                                    
-                                       
-                                    
+
                                     NavigationLink {
                                         TimeZoneView().navigationBarBackButtonHidden()
                                     } label: {
-                                        HStack {
-                                            Image(systemName: "globe.europe.africa.fill")
-                                                .foregroundStyle(.white)
-                                                .font(.system(size: 16))
-                                            
-                                            Text("Time Zone")
-                                                .foregroundStyle(.white)
-                                                .fontWeight(.semibold)
-                                            
-                                            Spacer()
-                                            
-                                            Image(systemName: "chevron.right")
-                                                .foregroundStyle(.gray)
-                                                .font(.system(size: 16))
-                                        }
-                                        .padding(.horizontal, 24)
-                                        .frame(height: 30)
-                                        .contentShape(Rectangle())
+                                        settingsRow(icon: "globe.europe.africa.fill", title: "Time Zone", height: 30)
                                     }
                                     .buttonStyle(.plain)
-                                    
-                                    
-                                   DividerLine()
-                                       
-                                    
+
+                                    DividerLine()
+
                                     NavigationLink {
                                         OtherView().navigationBarBackButtonHidden()
                                     } label: {
-                                        HStack {
-                                            Image(systemName: "hammer.circle")
-                                                .foregroundStyle(.white)
-                                                .font(.system(size: 16))
-                                            
-                                            Text("Other")
-                                                .foregroundStyle(.white)
-                                                .fontWeight(.semibold)
-                                            
-                                            Spacer()
-                                            
-                                            Image(systemName: "chevron.right")
-                                                .foregroundStyle(.gray)
-                                                .font(.system(size: 16))
-                                        }
-                                        .padding(.horizontal, 24)
-                                        .frame(height: 26)
-                                        .contentShape(Rectangle())
+                                        settingsRow(icon: "hammer.circle", title: "Other", height: 26)
                                     }
                                     .buttonStyle(.plain)
                                 }
                             )
                     }
-                    
-                    //MARK: - About Section
+
+                    // MARK: - About Section
                     VStack(alignment: .leading) {
                         Text("ABOUT")
                             .foregroundStyle(.gray)
                             .fontWeight(.semibold)
                             .font(.system(size: 12))
                             .padding(.horizontal, 22)
-                        
+
                         RoundedRectangle(cornerRadius: 10)
                             .foregroundStyle(.white.opacity(0.07))
                             .containerRelativeFrame(.horizontal) { width, _ in
@@ -268,117 +158,43 @@ struct SettingsView: View {
                                     NavigationLink {
                                         Text("Share view")
                                     } label: {
-                                        HStack {
-                                            Image(systemName: "square.and.arrow.up")
-                                                .foregroundStyle(.white)
-                                                .font(.system(size: 16))
-                                            
-                                            Text("Share TrueCam")
-                                                .foregroundStyle(.white)
-                                                .fontWeight(.semibold)
-                                            
-                                            Spacer()
-                                            
-                                            Image(systemName: "chevron.right")
-                                                .foregroundStyle(.gray)
-                                                .font(.system(size: 16))
-                                        }
-                                        .padding(.horizontal, 24)
-                                        .frame(height: 30)
-                                        .contentShape(Rectangle())
+                                        settingsRow(icon: "square.and.arrow.up", title: "Share TrueCam", height: 30)
                                     }
                                     .buttonStyle(.plain)
-                                    
-                                    
-                                   DividerLine()
-                                        
-                                    
+
+                                    DividerLine()
+
                                     NavigationLink {
                                         Text("Rating View")
                                     } label: {
-                                        HStack {
-                                            Image(systemName: "star")
-                                                .foregroundStyle(.white)
-                                                .font(.system(size: 16))
-                                            
-                                            Text("Rate TrueCam")
-                                                .foregroundStyle(.white)
-                                                .fontWeight(.semibold)
-                                            
-                                            Spacer()
-                                            
-                                            Image(systemName: "chevron.right")
-                                                .foregroundStyle(.gray)
-                                                .font(.system(size: 16))
-                                        }
-                                        .padding(.horizontal, 24)
-                                        .frame(height: 30)
-                                        .contentShape(Rectangle())
+                                        settingsRow(icon: "star", title: "Rate TrueCam", height: 30)
                                     }
                                     .buttonStyle(.plain)
-                                    
-                                    
+
                                     DividerLine()
 
-                                    
                                     NavigationLink {
                                         HelpView().navigationBarBackButtonHidden()
                                     } label: {
-                                        HStack {
-                                            Image(systemName: "lifepreserver")
-                                                .foregroundStyle(.white)
-                                                .font(.system(size: 16))
-                                            
-                                            Text("Help")
-                                                .foregroundStyle(.white)
-                                                .fontWeight(.semibold)
-                                            
-                                            Spacer()
-                                            
-                                            Image(systemName: "chevron.right")
-                                                .foregroundStyle(.gray)
-                                                .font(.system(size: 16))
-                                        }
-                                        .padding(.horizontal, 24)
-                                        .frame(height: 26)
-                                        .contentShape(Rectangle())
+                                        settingsRow(icon: "lifepreserver", title: "Help", height: 26)
                                     }
                                     .buttonStyle(.plain)
-                                    
+
                                     DividerLine()
 
-                                    
                                     NavigationLink {
                                         Text("About view")
                                     } label: {
-                                        HStack {
-                                            Image(systemName: "info.circle")
-                                                .foregroundStyle(.white)
-                                                .font(.system(size: 16))
-                                            
-                                            Text("About")
-                                                .foregroundStyle(.white)
-                                                .fontWeight(.semibold)
-                                            
-                                            Spacer()
-                                            
-                                            Image(systemName: "chevron.right")
-                                                .foregroundStyle(.gray)
-                                                .font(.system(size: 16))
-                                        }
-                                        .padding(.horizontal, 24)
-                                        .frame(height: 30)
-                                        .contentShape(Rectangle())
+                                        settingsRow(icon: "info.circle", title: "About", height: 30)
                                     }
                                     .buttonStyle(.plain)
-                                    
                                 }
-                                
                             )
                     }
-                    VStack() {
+
+                    VStack {
                         Button {
-                            vm.signOut()
+                            viewModel.signOut()
                         } label: {
                             RoundedRectangle(cornerRadius: 10)
                                 .foregroundStyle(.white.opacity(0.07))
@@ -391,7 +207,7 @@ struct SettingsView: View {
                                 )
                         }
 
-                        Text("version 0.0.0 - production")
+                        Text("version 0.0.1 - production")
                             .foregroundStyle(Color.gray)
                             .font(.system(size: 12))
                             .padding(.top, 12)
@@ -401,8 +217,99 @@ struct SettingsView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
     }
-}
 
-//#Preview {
-//    SettingsView()
-//}
+    // MARK: - Reusable row
+
+    @ViewBuilder
+    private func settingsRow(icon: String, title: String, height: CGFloat) -> some View {
+        HStack {
+            Image(systemName: icon)
+                .foregroundStyle(.white)
+                .font(.system(size: 16))
+
+            Text(title)
+                .foregroundStyle(.white)
+                .fontWeight(.semibold)
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .foregroundStyle(.gray)
+                .font(.system(size: 16))
+        }
+        .padding(.horizontal, 24)
+        .frame(height: height)
+        .contentShape(Rectangle())
+    }
+
+    // MARK: - Profile card
+
+    @ViewBuilder
+    private func profileCard(for user: User) -> some View {
+        RoundedRectangle(cornerRadius: 16)
+            .foregroundStyle(.white.opacity(0.07))
+            .containerRelativeFrame(.horizontal) { width, _ in
+                width * 0.9
+            }
+            .frame(height: 90)
+            .overlay(
+                HStack {
+                    if let imageUrl = user.profileImageUrl,
+                       let url = URL(string: imageUrl) {
+
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } placeholder: {
+                            Circle()
+                                .foregroundStyle(.gray.opacity(0.1))
+                        }
+                        .frame(width: 60, height: 60)
+                        .clipShape(Circle())
+
+                    } else {
+                        Circle()
+                            .frame(width: 60, height: 60)
+                            .foregroundStyle(.gray.opacity(0.1))
+                            .overlay(
+                                Text(user.name.prefix(1).uppercased())
+                                    .foregroundStyle(.white)
+                                    .font(.system(size: 60 * 0.45, weight: .semibold))
+                            )
+                    }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(user.name)
+                            .foregroundStyle(.white)
+                            .fontWeight(.semibold)
+                            .font(.system(size: 18))
+
+                        Text("@\(user.username ?? "username")")
+                            .foregroundStyle(.white.opacity(0.8))
+                            .fontWeight(.semibold)
+                            .font(.system(size: 14))
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(.gray)
+                        .font(.system(size: 20))
+                }
+                    .padding(.horizontal, 20)
+            )
+    }
+
+    private var profileCardPlaceholder: some View {
+        RoundedRectangle(cornerRadius: 16)
+            .foregroundStyle(.white.opacity(0.07))
+            .containerRelativeFrame(.horizontal) { width, _ in
+                width * 0.9
+            }
+            .frame(height: 90)
+            .overlay(
+                ProgressView().tint(.white)
+            )
+    }
+}
