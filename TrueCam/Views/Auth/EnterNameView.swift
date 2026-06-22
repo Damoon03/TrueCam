@@ -2,12 +2,10 @@
 //  EnterNameView.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 3/4/1405 AP.
-//
 import SwiftUI
 
 struct EnterNameView: View {
-    
+
     @Binding var name: String
     let onConfirm: () -> Void
 

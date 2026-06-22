@@ -2,8 +2,6 @@
 //  AuthenticationViewModel.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 3/9/1405 AP.
-//
 
 import SwiftUI
 import FirebaseAuth
@@ -11,74 +9,45 @@ import FirebaseFirestore
 import Combine
 
 enum AuthStep {
-    case name
-    case age
-    case phone
-    case code
-    case done
+    case name, age, phone, code, done
 }
 
 @MainActor
 final class AuthenticationViewModel: ObservableObject {
 
     @Published var step: AuthStep = .name
-
     @Published var name: String = ""
     @Published var birthDate: Date? = nil
     @Published var phone: String = ""
     @Published var code: String = ""
-
     @Published var isSendingOTP = false
     @Published var verificationID: String?
-
     @Published var authError: String?
-
     @Published var countryCode: String = "98"
-
     @Published var userSession: FirebaseAuth.User?
     @Published var currentUser: User?
-    
 
     private var authListener: AuthStateDidChangeListenerHandle?
 
     init() {
         setupAuthListener()
-        
-        if let user = Auth.auth().currentUser {
-            print("User exists:", user.uid)
-        } else {
-            print("No authenticated user")
-        }
-
     }
 
     deinit {
-        if let authListener {
-            Auth.auth().removeStateDidChangeListener(authListener)
-        }
+        if let authListener { Auth.auth().removeStateDidChangeListener(authListener) }
     }
-
-    // MARK: - Auth Listener
 
     private func setupAuthListener() {
         authListener = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             guard let self else { return }
-
             self.userSession = user
-
-            if user != nil {
-                Task {
-                    await self.fetchUser()
-                }
-            }
+            if user != nil { Task { await self.fetchUser() } }
         }
     }
 
     // MARK: - Validation
 
-    var canConfirmName: Bool {
-        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
+    var canConfirmName: Bool { !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
 
     var canConfirmAge: Bool {
         guard let birthDate else { return false }
@@ -86,152 +55,52 @@ final class AuthenticationViewModel: ObservableObject {
         return age >= 18
     }
 
-    var canConfirmPhone: Bool {
-        let trimmed = phone.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.count >= 10
-    }
+    var canConfirmPhone: Bool { phone.trimmingCharacters(in: .whitespacesAndNewlines).count >= 10 }
+    var canConfirmCode: Bool { code.count == 6 }
 
-    var canConfirmCode: Bool {
-        code.count == 6
+    var e164Phone: String {
+        var clean = phone.filter(\.isNumber)
+        if clean.hasPrefix("0") { clean.removeFirst() }
+        return "+\(countryCode)\(clean)"
     }
 
     // MARK: - Flow
 
     func confirmName() {
         guard canConfirmName else { return }
-
-        withAnimation(.snappy) {
-            step = .age
-        }
+        withAnimation(.snappy) { step = .age }
     }
 
     func confirmAge() {
         guard canConfirmAge else { return }
-
-        withAnimation(.snappy) {
-            step = .phone
-        }
+        withAnimation(.snappy) { step = .phone }
     }
 
-    func confirmPhone() async {
-        await sendOTP()
-    }
+    func confirmPhone() async { await sendOTP() }
 
     func confirmCode() async {
-
-        guard let verificationID else { return }
-        guard canConfirmCode else { return }
-
+        guard let verificationID, canConfirmCode else { return }
         do {
-
-            let credential = PhoneAuthProvider.provider()
-                .credential(
-                    withVerificationID: verificationID,
-                    verificationCode: code
-                )
-
+            let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationID, verificationCode: code)
             let result = try await Auth.auth().signIn(with: credential)
-
             self.userSession = result.user
-
             await createUser()
-
-            withAnimation(.snappy) {
-                step = .done
-            }
-
+            withAnimation(.snappy) { step = .done }
         } catch {
             authError = error.localizedDescription
         }
-    }
-    
-    //MARK: - Edit Profile View
-    func updateUserProfile(
-        fullname: String,
-        username: String,
-        bio: String,
-        location: String
-    ) async throws {
-        
-        guard let uid = userSession?.uid else { return }
-        
-        let data: [String: Any] = [
-            "name": fullname,
-            "username": username,
-            "bio": bio,
-            "location": location
-        ]
-        
-        try await Firestore.firestore()
-            .collection("users")
-            .document(uid)
-            .updateData(data)
-        
-        currentUser?.name = fullname
-        currentUser?.username = username
-        currentUser?.bio = bio
-        currentUser?.location = location
-    }
-
-    @MainActor
-    func updateProfileImage(_ image: UIImage) async {
-        guard let uid = userSession?.uid else { return }
-        
-        do {
-            let imageUrl = try await ImageUploader.uploadImage(image, uid: uid)
-            
-            try await Firestore.firestore()
-                .collection("users")
-                .document(uid)
-                .updateData([
-                    "profileImageUrl": imageUrl
-                ])
-            
-            currentUser?.profileImageUrl = imageUrl
-            
-        } catch {
-            print("DEBUG: Failed to update profile image:", error.localizedDescription)
-        }
-    
-
-    }
-
-
-
-    // MARK: - Phone Formatting
-
-    var e164Phone: String {
-        var clean = phone.filter(\.isNumber)
-
-        if clean.hasPrefix("0") {
-            clean.removeFirst()
-        }
-
-        return "+\(countryCode)\(clean)"
     }
 
     // MARK: - OTP
 
     func sendOTP() async {
-
-        guard !isSendingOTP else { return }
-        guard canConfirmPhone else { return }
-
+        guard !isSendingOTP, canConfirmPhone else { return }
         isSendingOTP = true
         defer { isSendingOTP = false }
-
         do {
-
-            let verificationID = try await PhoneAuthProvider
-                .provider()
-                .verifyPhoneNumber(e164Phone, uiDelegate: nil)
-
-            self.verificationID = verificationID
-
-            withAnimation(.snappy) {
-                step = .code
-            }
-
+            let id = try await PhoneAuthProvider.provider().verifyPhoneNumber(e164Phone, uiDelegate: nil)
+            self.verificationID = id
+            withAnimation(.snappy) { step = .code }
         } catch {
             authError = error.localizedDescription
         }
@@ -240,44 +109,56 @@ final class AuthenticationViewModel: ObservableObject {
     // MARK: - Firestore
 
     func createUser() async {
-
         guard let uid = userSession?.uid else { return }
-
-        let db = Firestore.firestore()
-
         let userData: [String: Any] = [
             "id": uid,
             "name": name,
             "phone": e164Phone,
-            "date": birthDate ?? Date()
+            "date": birthDate ?? Date(),
+            "friendUIDs": [],
+            "friendRequestsSent": [],
+            "friendRequestsReceived": []
         ]
-
         do {
-            try await db.collection("users")
-                .document(uid)
-                .setData(userData)
+            try await Firestore.firestore().collection("users").document(uid).setData(userData)
         } catch {
             print("Create user error:", error.localizedDescription)
         }
     }
 
     func fetchUser() async {
-
         guard let uid = userSession?.uid else { return }
-
         do {
-            let snapshot = try await Firestore.firestore()
-                .collection("users")
-                .document(uid)
-                .getDocument()
-
-            self.currentUser = try snapshot.data(as: User.self)
-
+            self.currentUser = try await UserService.fetchUser(uid: uid)
         } catch {
             print("Fetch user error:", error.localizedDescription)
         }
     }
-    
+
+    // MARK: - Profile editing
+
+    func updateUserProfile(fullname: String, username: String, bio: String, location: String) async throws {
+        guard let uid = userSession?.uid else { return }
+        try await UserService.updateProfile(uid: uid, fullname: fullname, username: username, bio: bio, location: location)
+        currentUser?.name = fullname
+        currentUser?.username = username
+        currentUser?.bio = bio
+        currentUser?.location = location
+    }
+
+    func updateProfileImage(_ image: UIImage) async {
+        guard let uid = userSession?.uid else { return }
+        do {
+            let imageUrl = try await ImageUploader.uploadProfileImage(image, uid: uid)
+            try await UserService.updateProfileImageURL(uid: uid, url: imageUrl)
+            currentUser?.profileImageUrl = imageUrl
+        } catch {
+            print("Profile image update error:", error.localizedDescription)
+        }
+    }
+
+    // MARK: - Sign out
+
     func signOut() {
         do {
             try Auth.auth().signOut()

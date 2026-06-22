@@ -2,8 +2,6 @@
 //  EnterCodeView.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 3/8/1405 AP.
-//
 
 import SwiftUI
 import Combine
@@ -123,7 +121,6 @@ struct EnterCodeView: View {
         Group {
             if canResend {
                 Button {
-                    // Reset timer state
                     timeRemaining = 59
                     canResend = false
 

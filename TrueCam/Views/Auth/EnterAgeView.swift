@@ -2,8 +2,6 @@
 //  EnterAgeView.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 3/9/1405 AP.
-//
 
 import SwiftUI
 

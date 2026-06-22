@@ -2,8 +2,6 @@
 //  CodeBox.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 3/8/1405 AP.
-//
 
 import SwiftUI
 
@@ -11,11 +9,11 @@ struct CodeBox: View {
     let index: Int
     let code: String
     let isFocused: Bool
-    
+
     var body: some View {
         let char = index < code.count ? String(code[code.index(code.startIndex, offsetBy: index)]) : ""
         let isSelected = isFocused && index == min(code.count, 5)
-        
+
         Text(char)
             .font(.system(size: 22, weight: .medium))
             .foregroundStyle(.white)

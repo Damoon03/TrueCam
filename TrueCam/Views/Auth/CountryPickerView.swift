@@ -1,9 +1,8 @@
 //
-//  SelectCountryView.swift
+//  CountryPickerView.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 3/6/1405 AP.
-//
+
 import SwiftUI
 
 struct CountryPickerView<Store: CountriesStoreProtocol>: View {
@@ -28,7 +27,7 @@ struct CountryPickerView<Store: CountriesStoreProtocol>: View {
             ZStack {
                 Color.black
                     .ignoresSafeArea()
-                
+
 
                 Group {
                     if store.isLoading {
@@ -77,7 +76,7 @@ struct CountryPickerView<Store: CountriesStoreProtocol>: View {
                         Image(systemName: "arrow.backward")
                             .font(.system(size: 16))
                             .foregroundStyle(.white)
-                            
+
                     }
                 }
                 .sharedBackgroundVisibility(.hidden)

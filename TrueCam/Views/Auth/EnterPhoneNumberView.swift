@@ -2,8 +2,6 @@
 //  EnterPhoneNumberView.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 3/7/1405 AP.
-//
 import SwiftUI
 
 struct EnterPhoneNumberView: View {
@@ -11,7 +9,7 @@ struct EnterPhoneNumberView: View {
     @State private var country = Country(phoneCode: "98", isoCode: "IR")
     @State private var showCountryList = false
     @FocusState private var isFocused: Bool
-    
+
     @ObservedObject var vm: AuthenticationViewModel
     let onConfirm: () -> Void
 
@@ -138,9 +136,3 @@ struct EnterPhoneNumberView: View {
         }
     }
 }
-
-
-
-//#Preview {
-//    EnterPhoneNumberView(vm: <#AuthenticationViewModel#>, number: .constant(""), onConfirm: {})
-//}

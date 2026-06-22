@@ -2,38 +2,36 @@
 //  EditProfileView.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 2/27/1405 AP.
-//
 
 import SwiftUI
 import PhotosUI
 
 struct EditProfileView: View {
-    
+
     @State private var fullname: String
     @State private var username: String
     @State private var bio: String
     @State private var location: String
 
     @Environment(\.dismiss) var dismiss
-    
+
     @EnvironmentObject var viewModel: AuthenticationViewModel
-    
+
     @State private var selectedItem: PhotosPickerItem?
     @State private var profileImage: Image?
     @State private var uiImage: UIImage?
 
-    
     let currentUser: User
-    
+
     init(currentUser: User) {
         self.currentUser = currentUser
-        
+
         _fullname = State(initialValue: currentUser.name)
         _username = State(initialValue: currentUser.username ?? "")
         _bio = State(initialValue: currentUser.bio ?? "")
         _location = State(initialValue: currentUser.location ?? "")
     }
+
     private var hasChanges: Bool {
         fullname != currentUser.name ||
         username != (currentUser.username ?? "") ||
@@ -45,7 +43,7 @@ struct EditProfileView: View {
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            
+
             VStack {
                 // MARK: Header
                 ZStack {
@@ -58,7 +56,7 @@ struct EditProfileView: View {
                         }
 
                         Spacer()
-                    
+
                         Button {
                             Task {
                                 do {
@@ -68,11 +66,11 @@ struct EditProfileView: View {
                                         bio: bio,
                                         location: location
                                     )
-                                    
+
                                     if let uiImage {
                                         await viewModel.updateProfileImage(uiImage)
                                     }
-                                    
+
                                     dismiss()
                                 } catch {
                                     print("Update error:", error.localizedDescription)
@@ -88,18 +86,18 @@ struct EditProfileView: View {
 
                     }
                     .padding(.horizontal)
-                    
+
                     Text("Edit Profile")
                         .foregroundStyle(.white)
                         .fontWeight(.semibold)
                 }
-                
+
                 DividerLine()
-                
+
                 // MARK: Profile section
                 PhotosPicker(selection: $selectedItem, matching: .images) {
                     ZStack(alignment: .bottomTrailing) {
-                        
+
                         if let profileImage {
                             profileImage
                                 .resizable()
@@ -133,15 +131,15 @@ struct EditProfileView: View {
                             Circle()
                                 .frame(width: 34, height: 34)
                                 .foregroundStyle(.black)
-                            
+
                             Circle()
                                 .frame(width: 30, height: 30)
                                 .foregroundStyle(.white)
-                            
+
                             Circle()
                                 .frame(width: 30, height: 30)
                                 .foregroundStyle(.black.opacity(0.1))
-                            
+
                             Image(systemName: "camera.fill")
                                 .font(.system(size: 16))
                                 .foregroundStyle(.black)
@@ -158,32 +156,26 @@ struct EditProfileView: View {
                             return
                         }
 
-                        print("✅ Image loaded")
-                        print("Size in bytes:", data.count)
-                        print("Dimensions:", uiImage.size)
-
                         self.uiImage = uiImage
                         self.profileImage = Image(uiImage: uiImage)
                     }
                 }
 
-
-
                 DividerLine()
-                
+
                 // MARK: Form Section
                 VStack(spacing: 20) {
-                    
+
                     LabeledField(label: "Full Name", placeholder: "Damoon", text: $fullname)
                         .padding(.horizontal)
 
                     DividerLine()
-                    
+
                     LabeledField(label: "Username", placeholder: "damoon_che", text: $username)
                         .padding(.horizontal)
 
                     DividerLine()
-                    
+
                     HStack(alignment: .top) {
                         Text("Bio")
                             .foregroundStyle(.white)
@@ -209,19 +201,15 @@ struct EditProfileView: View {
                     .padding(.horizontal)
 
                     DividerLine()
-                    
+
                     LabeledField(label: "Location", placeholder: "Add your location", text: $location)
                         .padding(.horizontal)
 
                 }
                 .padding(.top, 20)
-                
+
                 Spacer()
             }
         }
     }
 }
-
-//#Preview {
-//    EditProfileView(currentUser: User.init(from: Constant.1))
-//}

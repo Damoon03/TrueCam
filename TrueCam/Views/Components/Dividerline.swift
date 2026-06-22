@@ -2,8 +2,6 @@
 //  Dividerline.swift
 //  TrueCam
 //
-//  Created by Damoon saber on 2/27/1405 AP.
-//
 
 import SwiftUI
 
